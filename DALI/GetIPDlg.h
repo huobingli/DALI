@@ -1,6 +1,8 @@
 #include "DALIDlg.h"
 #pragma once
 #include "FrameUI.h"
+
+
 // CGetIPDlg ¶Ô»°¿ò
 
 class CGetIPDlg : public CDialogEx

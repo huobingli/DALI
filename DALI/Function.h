@@ -5,11 +5,11 @@
 #include <algorithm>
 using namespace std;
 
-#ifdef FUNCTION_H_INCLUDE
-#define FUNCTION_H_INCLUDE 
+
 //这里面写你原来的代码
 
-
+#ifndef FUNCTION_H
+#define FUNCTION_H
 
 //字符串反转
 void strrev1(char *s)
@@ -122,5 +122,16 @@ int hex_to_decimal(const char* szHex, int len)
 	return result;
 }
 
+
+unsigned char HexToAsc(unsigned char aChar){
+	if ((aChar >= 0x30) && (aChar <= 0x39))
+		aChar -= 0x30;
+	else if ((aChar >= 0x41) && (aChar <= 0x46))//大写字母
+		aChar -= 0x37;
+	else if ((aChar >= 0x61) && (aChar <= 0x66))//小写字母
+		aChar -= 0x57;
+	else aChar = 0xff;
+	return aChar;
+}
 
 #endif

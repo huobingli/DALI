@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 
 
+
 // CControllerShow 对话框
 
 IMPLEMENT_DYNAMIC(CControllerShow, CDialogEx)
@@ -88,7 +89,6 @@ void CControllerShow::OnBnScanDevice()
 	memcpy(pDeviceCommand->DevicePWD, m_FrameUI->DevicePWD, 16);
 
 	unsigned char cBuf[8] = { 0 };
-
 	m_FrameUI->setStatusBar("正在扫描控制器中... 请稍候...");
 	//huobingli	
 	m_FrameUI->scanCtrlDevice(pDeviceCommand, (char*)cBuf);
@@ -97,6 +97,7 @@ void CControllerShow::OnBnScanDevice()
 	delete pDeviceCommand;
 	pDeviceCommand = NULL;
 
+	//cBuf[0] = 0x01;
 	//获取设备信息数组
 	for (int i = 0; i < 8; ++i)
 	{
@@ -159,12 +160,17 @@ void CControllerShow::OnBnRead()
 	memcpy(pDeviceCommand->DeviceID, m_FrameUI->DeviceID, 4);
 	memcpy(pDeviceCommand->DevicePWD, m_FrameUI->DevicePWD, 16);
 
-	char cBuf[INFO_SIZE+1] = { "Chris0000000CA" };
+	//char cBuf[INFO_SIZE+1] = { 0 };
 
 	m_FrameUI->setStatusBar("正在读取配置中... 请稍候...");
+	
+	char cBuf[15] = { 0 };
 	//huobingli
 	m_FrameUI->readCtrlSaveConf(pDeviceCommand, (char*)cBuf);
 	//huobingli
+
+	//test cBuf
+	//char cBuf[15] = { 0x68, 0x75, 0x6f, 0x62, 0x69, 0x6e, 0x67, 0x6c, 0x69, 0x00, 0x00, 0x00, 0xaf, 0xcd };
 
 	delete pDeviceCommand;
 	pDeviceCommand = NULL;
@@ -179,6 +185,40 @@ void CControllerShow::OnBnRead()
 	m_FrameUI->setStatusBar("读取配置成功！");
 
 }
+
+
+
+void CControllerShow::GetParam(char *buffer) {
+	
+	CString buf;
+	CEdit *Edit;
+	for (int i = 0; i < 5; i++) {
+		Edit = (CEdit*)GetDlgItem(CS_IDC_EDIT_NAME + i);
+		Edit->GetWindowText(buf);
+		const char *cbuf = (LPSTR)(LPCTSTR)buf;
+
+		if (i == 0) {
+			//CString sInfo;
+			//GetDlgItemText(CS_IDC_EDIT_NAME + i, sInfo);
+			//const char *cbuf = (LPSTR)(LPCTSTR)sInfo;
+			strcpy(buffer, cbuf);
+		}
+		else {
+			if (i == 1)
+				buffer[12] = HexToAsc((char)(int(cbuf[0]) + (int)cbuf[1]));
+			else if (i == 2)
+				buffer[12] = (buffer[12] << 4) + HexToAsc((char)(int(cbuf[0]) + (int)cbuf[1]));
+			else if (i == 3)
+				buffer[13] = HexToAsc((char)(int(cbuf[0]) + (int)cbuf[1]));
+			else {
+				buffer[13] = (buffer[13] << 4) + HexToAsc((char)(int(cbuf[0]) + (int)cbuf[1]));
+			}
+			//strcpy(buffer + 10 + i, cbuf);
+		}
+	}
+
+}
+
 /*功能：保存函数*/
 void CControllerShow::OnBnSave()
 {
@@ -189,18 +229,21 @@ void CControllerShow::OnBnSave()
 	//设置主机ID和密码
 	memcpy(pDeviceCommand->DeviceID, m_FrameUI->DeviceID, 4);
 	memcpy(pDeviceCommand->DevicePWD, m_FrameUI->DevicePWD, 16);
-
-	char cBuf[INFO_SIZE + 1] = { '\0' };
-	memcpy(cBuf, m_DALIDeviceArray[pDeviceCommand->nID].cInfo, INFO_SIZE);
 	
-	//BLL->接口(pDeviceCommand,cBuf);
+	char cBuf[INFO_SIZE + 1] = { '\0' };
+	
+	//获得对话框信息，并整合传入到BLL层
+	GetParam(cBuf);
 
+	memcpy(m_DALIDeviceArray[pDeviceCommand->nID].cInfo, cBuf, INFO_SIZE);
+	
 	m_FrameUI->setStatusBar("正在保存配置... 请稍候... ");
 	//huobingli
 	m_FrameUI->sendCtrlSaveConf(pDeviceCommand, cBuf);
 	//huobingli
 
 	m_FrameUI->setStatusBar("保存配置成功!");
+
 	delete pDeviceCommand;
 	pDeviceCommand = NULL;
 }
@@ -287,15 +330,14 @@ void CControllerShow::ShowEdit(int nPos)
 
 	/*显示其他参数*/
 
-	int nP1S = *(pBuf + NAME_SIZE) >> 4;
+	int nP1S = (*(pBuf + NAME_SIZE) >> 4 )& 0x0F;
 	SetDlgItemInt(CS_IDC_EDIT_PANNEL1_SENCE, nP1S);
 	int nP1G = *(pBuf + NAME_SIZE) & 0x0F;
 	SetDlgItemInt(CS_IDC_EDIT_PANNEL1_GROUP, nP1G);
-	int nP2S = *(pBuf + NAME_SIZE + 1) >> 4;
+	int nP2S = (*(pBuf + NAME_SIZE + 1) >> 4) &0x0F;
 	SetDlgItemInt(CS_IDC_EDIT_PANNEL2_SENCE, nP2S);
 	int nP2G = *(pBuf + NAME_SIZE + 1) & 0x0F;
 	SetDlgItemInt(CS_IDC_EDIT_PANNEL2_GROUP, nP2G);
-
 }
 void CControllerShow::ShowDALIDevice()
 {

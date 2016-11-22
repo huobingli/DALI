@@ -1,6 +1,7 @@
 #pragma once
 #include "def.h"
 #include "FrameUI.h"
+//#include "function.h"
 
 // CControllerShow 对话框
 class CControllerShow : public CDialogEx
@@ -48,6 +49,17 @@ private:
 	void ShowDALIDevice();								//显示DALI设备状态
 	void UpdateTag(char* pBuf, int nCycleTime);			//更新DALI设备标志
 
+	void GetParam(char *buffer);
+	unsigned char HexToAsc(unsigned char aChar){
+		if ((aChar >= 0x30) && (aChar <= 0x39))
+			aChar -= 0x30;
+		else if ((aChar >= 0x41) && (aChar <= 0x46))//大写字母
+			aChar -= 0x37;
+		else if ((aChar >= 0x61) && (aChar <= 0x66))//小写字母
+			aChar -= 0x57;
+		else aChar = 0xff;
+		return aChar;
+	}
 private:
 	CFrameUI *m_FrameUI;
 };

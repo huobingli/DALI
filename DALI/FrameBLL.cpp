@@ -307,6 +307,10 @@ void CFrameBLL::sendScan(_console_command *pCC, char *buffer) {
 	tempCacheNode = NULL;
 }
 
+//static DWORD WINAPI wait(LPVOID arg) {
+	
+//}
+
 void CFrameBLL::detectScan(_console_command *pCC, char *buffer) {
 	memset(m_SendCache, 0, sizeof(m_SendCache));
 
@@ -332,6 +336,11 @@ void CFrameBLL::detectScan(_console_command *pCC, char *buffer) {
 	Sleep(8000);
 
 	cacheNode *tempCacheNode = new cacheNode();
+
+	//启动一个处理扫描线程
+	//HANDLE WaitHandle = CreateThread(NULL, 0, wait, NULL, 0, 0);
+	
+	//CloseHandle(WaitHandle);
 
 	//返回上一级界面
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x83, tempCacheNode);
@@ -653,7 +662,7 @@ void CFrameBLL::sendCtrlSaveConf(_device_command *pCPC, char*buffer) {
 		//主机密码
 		16, pCPC->DevicePWD,
 		1, &(char)mode,
-		14, &buffer
+		14, buffer
 		);
 	//pCP->command = 0x80 + 0x01;
 	//发送数据

@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 
 
+
 // CGetIPDlg ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(CGetIPDlg, CDialogEx)
