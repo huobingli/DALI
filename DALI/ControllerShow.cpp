@@ -164,7 +164,7 @@ void CControllerShow::OnBnRead()
 
 	m_FrameUI->setStatusBar("正在读取配置中... 请稍候...");
 	
-	char cBuf[15] = { 0 };
+	char cBuf[16] = { "0" };
 	//huobingli
 	m_FrameUI->readCtrlSaveConf(pDeviceCommand, (char*)cBuf);
 	//huobingli
@@ -178,7 +178,7 @@ void CControllerShow::OnBnRead()
 
 	//拷贝到内存中
 	int nDeviceID = GetDlgItemInt(CS_IDC_STATIC_DEVICE_ID);
-	memcpy(m_DALIDeviceArray[nDeviceID].cInfo, cBuf, INFO_SIZE);
+	memcpy(m_DALIDeviceArray[nDeviceID].cInfo, cBuf, INFO_SIZE+1);
 	//显示信息
 	ShowEdit(nDeviceID);
 

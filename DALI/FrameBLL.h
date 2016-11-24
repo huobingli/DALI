@@ -5,6 +5,21 @@
 
 static CCacheTable *analCacheTable;
 static CCacheTable *recvCacheTable;
+static CCacheTable *updtCacheTable;
+//设备数组
+//extern static DALI_DEVICE DeviceArray[DALI_DEVICE_NUM];	//DALI设备数组
+//static DALI_DEVICE DeviceArray2[DALI_DEVICE_NUM];	//DALI设备数组
+
+extern "C"
+{
+	int WINAPI MessageBoxTimeoutA(IN HWND hWnd, IN LPCSTR lpText, IN LPCSTR lpCaption, IN UINT uType, IN WORD wLanguageId, IN DWORD dwMilliseconds);
+	int WINAPI MessageBoxTimeoutW(IN HWND hWnd, IN LPCWSTR lpText, IN LPCWSTR lpCaption, IN UINT uType, IN WORD wLanguageId, IN DWORD dwMilliseconds);
+};
+#ifdef UNICODE
+#define MessageBoxTimeout MessageBoxTimeoutW
+#else
+#define MessageBoxTimeout MessageBoxTimeoutA
+#endif
 
 
 /*配置信息结构*/
@@ -50,6 +65,51 @@ typedef struct _param_command
 	unsigned char DeviceID[4];
 	unsigned char DevicePWD[16];
 }PARAM_COMMAND, PPARAM_COMMAND;
+
+
+//扫描设备线程
+/*
+static DWORD WINAPI scan(LPVOID pM) {
+	struct _scan_parameters *arg = (struct _scan_parameters*)pM;
+	
+
+	int num = 0;
+	CString head = "已扫描到 ";
+	CString end = "个设备 ";
+	CString message;
+	cacheNode *pCacheNode = new cacheNode();
+	char buffer[20] = { "0" };
+	while (1) {
+		arg->pAnalCacheTable->scanTable(0x83, pCacheNode);
+		//获取到数据
+		pCacheNode->getbuffer(buffer, 20); 
+		//完善到按钮数组
+		for (int j = 0; j < 8; ++j){
+			for (int i = 0; i < 8; ++i)
+			{
+				if (buffer[i] == '1')
+				{
+					DeviceArray[j * 8 + i].nTag = 1;
+				}
+				else
+				{
+					DeviceArray[j * 8 + i].nTag = 0;
+				}
+			}
+		}
+		//刷新界面
+		for (int i = 0; i < DALI_DEVICE_NUM; ++i)
+		{
+			//if (m_DALIDeviceArray[i].nTag == 1)
+			//	m_DALIDeviceArray[i].btn.EnableWindow(true);
+			//else
+				//m_DALIDeviceArray[i].btn.EnableWindow(false);
+		}
+		Sleep(1000);
+	}
+}
+*/
+
 
 class CFrameBLL
 {
@@ -115,5 +175,7 @@ private:
 	_socket_parameters *m_argSock;
 
 	CAnalyzeMessage *m_AnalyzeMessage;
+
+	_scan_parameters *m_argScan;
 };
 

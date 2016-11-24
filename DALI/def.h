@@ -54,12 +54,26 @@
 #define CPARAM_SAVE	0x11					//保存	
 /****************************************************************************************/
 
+/*DALI设备结构*/
+typedef struct _dali_device
+{
+	CButton btn;
+	int		nTag = 0;
+}DALI_DEVICE, *PDALI_DEVICE;
+
+
+
+
 /*getIPDlg 结构体*/
 struct _getdevice_info{
 	char cIP[15];
 	char cDeviceID[9];
 	char cDeviceName[20];
 };
+
+
+
+
 
 /*console 结构体*/
 /*Console命令结构*/
@@ -75,6 +89,9 @@ typedef struct _console_command
 
 	unsigned char DeviceID[4];
 	unsigned char DevicePWD[16];
+	
+	CStatusBarCtrl *pStatusBarCtrl;
+	_dali_device  oDeviceArray[64];
 }CONSOLE_COMMAND, *PCONSOLE_COMMAND;
 
 typedef struct _status
@@ -91,12 +108,6 @@ typedef struct _status
 	int nPowerFailure = 10;
 }STATUS, *PSTATUS;
 
-/*DALI设备结构*/
-typedef struct _dali_device
-{
-	CButton btn;
-	int		nTag = 0;
-}DALI_DEVICE,*PDALI_DEVICE;
 /*Group结构体*/
 
 /*Sence结构体*/
@@ -126,7 +137,7 @@ typedef struct _controller_device_info
 {
 	CButton btn;
 	int		nTag = 0;
-	char	cInfo[INFO_SIZE];
+	char	cInfo[INFO_SIZE + 1];
 }CTRDALI_DEVICE, *PCTRDALI_DEVICE;
 /*设备命令结构*/
 typedef struct _device_command
@@ -137,4 +148,5 @@ typedef struct _device_command
 	unsigned char DeviceID[4];
 	unsigned char DevicePWD[16];
 }DEVICE_COMMAND, *PDEVICE_COMMAND;
+
 

@@ -38,7 +38,7 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			analNode->setst(recvNode->getst());
 			analNode->setLength(recvNode->getLength());
 			//通过change,得到有用的信息
-			changeBuffer(recvBuffer, 12, (int)recvBuffer[12], analbuffer);
+			changeBuffer(recvBuffer, 12, (int)recvBuffer[11], analbuffer);
 			//传入需要返回的参数
 			analNode->setbuffer(analbuffer, 20);
 			//放入分析缓存
@@ -112,6 +112,20 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			changeBuffer(recvBuffer, 12, (int)recvBuffer[11], analbuffer);
 			//传入需要返回的参数
 			analNode->setbuffer(analbuffer, 10);
+			//放入分析缓存
+			analCacheTable->insertNode(analNode);
+			break;
+		}
+
+		case 0x90: {
+			//获得设备数目	;
+			analNode->setOperate(0x90);
+			analNode->setst(recvNode->getst());
+			analNode->setLength(14);
+			//通过change,得到有用的信息
+			changeBuffer(recvBuffer, 12, (int)recvBuffer[11], analbuffer);
+			//传入需要返回的参数
+			analNode->setbuffer(analbuffer, 14);
 			//放入分析缓存
 			analCacheTable->insertNode(analNode);
 			break;

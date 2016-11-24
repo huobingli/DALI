@@ -2,6 +2,31 @@
 
 #include "FrameBLL.h"
 
+
+
+
+static DWORD WINAPI Update(LPVOID pM) {
+	struct _update_parameters *arg = (struct _update_parameters*)pM;
+
+	cacheNode *tempCacheNode = new cacheNode();
+	char message[30];
+	int waittime = 0;
+	while (1){
+		if (arg->pUpdateCacheTable->getNodeNum() != 0){
+			memset(message, 0, 30);
+			//获得末尾节点
+			tempCacheNode = arg->pUpdateCacheTable->getEndNode();
+			//获得显示参数
+			tempCacheNode->getbuffer(message, 30);
+			waittime = tempCacheNode->getLength();
+			if (strlen(message) != 0) {
+				arg->pStatusBarCtrl->SetText(message, 0, 0);
+				Sleep(waittime);
+			}
+		}
+	}
+}
+
 class CFrameUI
 {
 public:
@@ -103,6 +128,14 @@ public:
 	void setStatusBar(CString status) {
 		m_StatusBarCtrl->SetText(status, 0, 0);
 	}
+
+	void insertNode(cacheNode *pcacheNode) {
+		m_argUpdate->pUpdateCacheTable->insertNode(pcacheNode);
+	}
+
+	CStatusBarCtrl *getStatusBarCtrl() {
+		return m_StatusBarCtrl;
+	}
 private:
 	CFrameBLL *m_FrameBLL;
 	int m_DeviceNum;
@@ -110,8 +143,10 @@ private:
 	CStatusBarCtrl *m_StatusBarCtrl;
 
 public:
-	DALI_DEVICE	m_DALIDeviceArray[DALI_DEVICE_NUM];	//DALI设备数组
 	unsigned char DeviceID[4];
 	unsigned char DevicePWD[16];
+	DALI_DEVICE m_DALIDeviceArray[DALI_DEVICE_NUM];
+	_update_parameters *m_argUpdate;
 };
+
 

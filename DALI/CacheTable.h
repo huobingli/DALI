@@ -314,5 +314,26 @@ public:
 		}
 	}
 
+
+	//扫描线程使用
+	int scanNode(int operate) {
+		int nodeNum = 0;
+		cacheNode *tempNode = m_HeadNode;
+		//如果查询到最后一个节点
+		if (m_NodeNum == 0)
+			return 0;
+		while (tempNode != m_EndNode) {
+			if (tempNode->getOperate() == operate) {
+				++nodeNum;
+			}
+			tempNode = tempNode->getNextNode();
+		}
+
+		if (tempNode->getOperate() == operate)
+			++nodeNum;
+
+		return nodeNum;
+	}
+
 };
 

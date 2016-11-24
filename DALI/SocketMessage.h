@@ -5,6 +5,7 @@
 #include "MessagePackage.h"
 #include "AnalyzeMessage.h"
 #include "CacheTable.h"
+#include "def.h"
 
 using namespace std;
 
@@ -46,10 +47,30 @@ typedef struct _thread_parameters{
 
 
 
+//需要将接收队列和处理队列传入进行查询，不改变内容
+typedef struct _scan_parameters{
+	//处理类需要结构
+	CCacheTable *pRecvCacheTable;
+	CCacheTable *pAnalCacheTable;
+	_dali_device pDeviceBtn[64];
+	char buffer[16];
+};
+
+typedef struct _update_parameters {
+	//更新状态栏数据缓冲区
+	CCacheTable *pUpdateCacheTable;
+
+	CStatusBarCtrl *pStatusBarCtrl;
+};
+
 //BLL全局接收线程
 static HANDLE handleRecv;
 static HANDLE handleAnal;
+static HANDLE handleScan;
+static HANDLE handleUpdate;
 //static HANDLE handleHeart;
+
+
 
 
 //接收参数方法
@@ -161,7 +182,7 @@ static DWORD WINAPI Heart(LPVOID pM) {
 	char a[6] = "heart";
 	while (1) {
 		int i = sendto(arg->st, a, strlen(a), 0, (sockaddr*)&arg->clientSock, sizeof(sockaddr_in));
-		Sleep(10000);
+		//Sleep(10000);
 	}
 }
 
@@ -170,23 +191,12 @@ static DWORD WINAPI Heart(LPVOID pM) {
 class CSocketMessage
 {
 private:
-	//保存服务器和客户端的地址结构
-	//ip   sockaddr_in.sin_addr
-	//port sockaddr_in.sin_port
-	//struct sockaddr_in m_ServerSock;
-	//struct sockaddr_in m_ClientSock;
-	//地址结构长度
-	//int m_Sockaddr_Length;
-	//
-	//SOCKET m_Socket;
-	HANDLE m_handleRecv;
+	//HANDLE m_handleRecv;
 
-	//SOCKET recvSock;
 	_socket_parameters *m_argRecv;
 
 	CAnalyzeMessage *m_AnalyzeMessage;
 
-	//_socket_broadcast *m_argBroad;
 public:
 	//在创建时传入有关的远程IP地址，直接在本地进行绑定
 	CSocketMessage(CAnalyzeMessage *pAM, CCacheTable *recvCacheTable, CCacheTable *analCacheTable);

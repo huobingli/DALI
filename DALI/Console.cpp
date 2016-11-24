@@ -59,7 +59,6 @@ void CConsole::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, CONSOLE_IDC_COMBO_SENCE, m_ComboSence);
 	//scroll bar 控件
 	DDX_Control(pDX, CONSOLE_IDC_SLIDERCTL, m_SliderCtrlConsole);
-	//DDX_Control(pDX, CONSOLE_IDC_SCROLLBAR_SENCE, m_ScrollBarSence);
 	DDX_Control(pDX, CONSOLE_IDC_CHECK_BROADCAST, m_CheckBroadCast);
 	DDX_Control(pDX, CONSOLE_IDC_CHECK_GROUP, m_CheckGroup);
 	DDX_Control(pDX, CONSOLE_IDC_CHECK_AUTOSENCE, m_CheckAutoSence);
@@ -74,6 +73,8 @@ void CConsole::DoDataExchange(CDataExchange* pDX)
 	{
 		DDX_Control(pDX, IDC_BUTTON1 + i, m_FrameUI->m_DALIDeviceArray[i].btn);
 	}
+
+	
 }
 
 
@@ -162,7 +163,6 @@ BOOL CConsole::OnInitDialog()
 	{
 		m_FrameUI->m_DALIDeviceArray[i].btn.EnableWindow(false);
 	}
-
 
 	m_ComboTargetAddr.SetCurSel(0);
 	
@@ -873,56 +873,83 @@ void CConsole::OnBnSDO()
 	else
 	{
 		m_FrameUI->setStatusBar("请选择正确模式");
+
 		//AfxMessageageBox(_T("请选择正确模式"));
 	}
 }
+
+
 /*功能：点击按钮扫描设备*/
 void CConsole::OnBnScanDevice()
 {
 	//reset ComboTargetAddr中数据
 	::SendMessage(m_ComboTargetAddr, CB_RESETCONTENT, NULL, NULL);
-	m_FrameUI->setStatusBar("扫描设备中");
-	//AfxMessageageBox(_T("扫描设备"));
-	//发送扫描设备命令
-	//获取设备信息数组
-	//unsigned char cBuf[8] = {0xFF,0xEF};
+	//m_FrameUI->setStatusBar("扫描设备中");
+	
+	cacheNode *pcacheNode = new cacheNode();
+	pcacheNode->setbuffer("扫描设备中", 10);
+	m_FrameUI->insertNode(pcacheNode);
+	
+	CString head = "倒计时 ";
+	CString end = " 秒";
+	CString message;
+	for (int i = 0; i < 10; i++){
+		message.Format("%s%d%s", head, 10 - i, end);
+		cacheNode *pcacheNode = new cacheNode();
+		pcacheNode->setbuffer(message.GetBuffer(), 15);
+		m_FrameUI->insertNode(pcacheNode);
+		pcacheNode->setLength(1000);
+			
+	}
+	
 	//huobingli
 	CONSOLE_COMMAND *pConsoleCommand = new CONSOLE_COMMAND();
 
 	pConsoleCommand->nCommand = 0x03;
 
-	char buffer[20];
+	pConsoleCommand->pStatusBarCtrl = m_FrameUI->getStatusBarCtrl();
+
+
+
+	unsigned char buffer[20];
 	memset(buffer, 0, sizeof(buffer));
 
 	//将获取到的主机ID和密码写入到结构体中
 	memcpy(pConsoleCommand->DeviceID, m_FrameUI->DeviceID, 4);
 	memcpy(pConsoleCommand->DevicePWD, m_FrameUI->DevicePWD, 16);
 
+	//memcpy(pConsoleCommand->oDeviceArray, m_DALIDeviceArray, sizeof(m_DALIDeviceArray));
+	
 	//huobingli
-	m_FrameUI->sendScan(pConsoleCommand, buffer);
+	m_FrameUI->sendScan(pConsoleCommand, (char*)buffer);
 	//huobingli
+	
 
+	//删除传参对象
 	delete pConsoleCommand;
 	pConsoleCommand = NULL;
 	
+	//buffer[0] = 0xff;
 	int totalNum = 0;
 	for (int i = 0; i < 8; ++i)
 	{
 		int nVal = (int)buffer[i];
-		totalNum = totalNum + nVal;
+		//totalNum = totalNum + nVal;
 		CString sVal;
 		itoa(nVal, sVal.GetBuffer(8), 2);
 		char* cVal = sVal.GetBuffer();
-		UpdateTag(cVal, i);
+		totalNum = totalNum + UpdateTag(cVal, i);
 	}
 	m_FrameUI->setDeviceNum(totalNum);
 
 	for (int i = 0; i < totalNum; i++) {
-		_itoa_s(i, buffer, sizeof(buffer), 10);
-		m_ComboTargetAddr.InsertString(i, buffer);
+		_itoa_s(i, (char*)buffer, sizeof(buffer), 10);
+		m_ComboTargetAddr.InsertString(i, (char*)buffer);
 	}
 	//m_ComboGroup.set
 	ShowDALIDevice();
+	if(m_ComboTargetAddr.GetCount()!= 0)
+		m_ComboTargetAddr.SetCurSel(0);
 	m_FrameUI->setStatusBar("扫描设备完成");
 }
 /*功能：点击按钮检测设备*/
@@ -938,11 +965,11 @@ void CConsole::OnBnDetectDevice()
 
 	pConsoleCommand->nCommand = 0x03;
 
-	char buffer[20];
+	unsigned char buffer[20];
 	memset(buffer, 0, sizeof(buffer));
 
 	//huobingli
-	m_FrameUI->detectScan(pConsoleCommand, buffer);
+	m_FrameUI->detectScan(pConsoleCommand, (char*)buffer);
 	//huobingli
 
 	delete pConsoleCommand;
@@ -960,10 +987,10 @@ void CConsole::OnBnDetectDevice()
 	}
 	m_FrameUI->setDeviceNum(totalNum);
 
-	for (int i = 0; i < totalNum; i++) {
+	/*for (int i = 0; i < totalNum; i++) {
 		_itoa_s(i, buffer, sizeof(buffer), 10);
 		m_ComboTargetAddr.InsertString(i, buffer);
-	}
+	}*/
 	//m_ComboGroup.set
 	ShowDALIDevice();
 	m_FrameUI->setStatusBar("扫描设备完成");
@@ -1169,17 +1196,21 @@ void CConsole::ShowDALIDevice()
 			m_FrameUI->m_DALIDeviceArray[i].btn.EnableWindow(false);
 	}
 }
-void CConsole::UpdateTag(char* pBuf,int nCycleTime)
+int CConsole::UpdateTag(char* pBuf,int nCycleTime)
 {
+	int deviceNum = 0;
 	for (int i = 0; i < 8; ++i)
 	{
 		if (pBuf[i] == '1')
 		{
 			m_FrameUI->m_DALIDeviceArray[nCycleTime * 8 + i].nTag = 1;
+			++deviceNum;
 		}
 		else
 		{
 			m_FrameUI->m_DALIDeviceArray[nCycleTime * 8 + i].nTag = 0;
 		}
 	}
+
+	return deviceNum;
 }

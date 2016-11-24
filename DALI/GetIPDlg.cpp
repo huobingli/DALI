@@ -101,8 +101,8 @@ BOOL CGetIPDlg::OnInitDialog()
 	m_ListCtrl.InsertColumn(1, "主机名称", LVCFMT_CENTER, 100);
 	m_ListCtrl.InsertColumn(2, "主机ID", LVCFMT_CENTER, 100);
 
-	/*
-	m_ListCtrl.InsertItem(0, "123.123.0.123");
+	
+	/*m_ListCtrl.InsertItem(0, "123.123.0.123");
 	m_ListCtrl.SetItemText(0, 1, "123");
 	m_ListCtrl.SetItemText(0, 2, "BB122112");
 	m_ListCtrl.InsertItem(1, "123.123.0.123");

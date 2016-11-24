@@ -6,6 +6,7 @@
 using namespace std;
 
 
+
 // CConsole 对话框
 class CConsole : public CDialogEx
 {
@@ -73,5 +74,5 @@ private:
 	void OptionalPart();								//一定条件后变得可以选择
 	void ShowStatus(STATUS* pStatus);					//显示状态
 	void ShowDALIDevice();								//显示DALI设备状态
-	void UpdateTag(char* pBuf,int nCycleTime);			//更新DALI设备标志
+	int UpdateTag(char* pBuf,int nCycleTime);			//更新DALI设备标志
 };

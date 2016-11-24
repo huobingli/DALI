@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FrameBLL.h"
+
 #include <conio.h>
 
 //DALI主机用户名和密码 通用参数
@@ -11,12 +12,25 @@ CFrameBLL::CFrameBLL()
 	//初始化接收处理队列
 	recvCacheTable = new CCacheTable(20);
 	analCacheTable = new CCacheTable(20);
+	
+
 	//创建初始socket
 	m_SocketMessage = new CSocketMessage(m_AnalyzeMessage, recvCacheTable, analCacheTable);
 	//需要封装messagePackage包的函数
 	m_MessagePackage = new CMessagePackage();
 	//发送cache
 	memset(m_SendCache, 0, sizeof(m_SendCache));
+
+	_scan_parameters *m_argScan = (_scan_parameters*)malloc(sizeof(_scan_parameters));
+	memset(m_argScan, 0, sizeof(m_argScan));
+
+	m_argScan->pRecvCacheTable = recvCacheTable;
+	m_argScan->pAnalCacheTable = analCacheTable;
+	
+	//test
+	//后台启动线程进行扫描
+	//handleScan = CreateThread(NULL, 0, scan, m_argScan, NULL, 0);
+	SuspendThread(handleScan);
 }
 
 
@@ -274,6 +288,8 @@ void CFrameBLL::sendConsoleParameters(_console_command *pCC) {
 
 //发送扫描命令
 void CFrameBLL::sendScan(_console_command *pCC, char *buffer) {
+
+	//memcpy(m_DALIDeviceArray, pCC->oDeviceArray, sizeof(pCC->oDeviceArray));
 	memset(m_SendCache, 0, sizeof(m_SendCache));
 
 	//打包参数
@@ -295,12 +311,37 @@ void CFrameBLL::sendScan(_console_command *pCC, char *buffer) {
 
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 
-	Sleep(8000);
+	
+	//end test
+	
+	//AfxMessageBox(dw);
+
+	//memcpy(m_argScan->pDeviceBtn, pCC->oDeviceArray, sizeof(pCC->oDeviceArray));
+	//handleScan线程恢复
+	ResumeThread(handleScan);
+
+	//线程搜索倒计时
+	CString head = "扫描倒计时 ";
+	CString end = " 秒";
+	CString message;
+	for (int i = 0; i < 10; i++){
+		message.Format("%s%d%s", head, 10 - i, end);
+		pCC->pStatusBarCtrl->SetText(message, 0, 0);
+		Sleep(1000);
+	}
+
+	 
+	//10s线程等待
+	//CloseHandle(handleScan);
+
+	DWORD dw = WaitForSingleObject(handleScan, 10000);
+	
+	//handleScan线程挂起
+	SuspendThread(handleScan);
 
 	cacheNode *tempCacheNode = new cacheNode();
-
 	//返回上一级界面
-	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x83, tempCacheNode);
+ 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x83, tempCacheNode);
 	tempCacheNode->getbuffer(buffer, 20);
 
 	delete tempCacheNode;
