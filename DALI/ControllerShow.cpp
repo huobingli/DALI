@@ -97,7 +97,7 @@ void CControllerShow::OnBnScanDevice()
 	delete pDeviceCommand;
 	pDeviceCommand = NULL;
 
-	//cBuf[0] = 0x01;
+	cBuf[0] = 0x01;
 	//获取设备信息数组
 	for (int i = 0; i < 8; ++i)
 	{
@@ -164,9 +164,9 @@ void CControllerShow::OnBnRead()
 
 	m_FrameUI->setStatusBar("正在读取配置中... 请稍候...");
 	
-	char cBuf[16] = { "0" };
+	char cBuf[15] = { 0 };
 	//huobingli
-	m_FrameUI->readCtrlSaveConf(pDeviceCommand, (char*)cBuf);
+	m_FrameUI->readCtrlSaveConf(pDeviceCommand, cBuf);
 	//huobingli
 
 	//test cBuf
@@ -178,7 +178,10 @@ void CControllerShow::OnBnRead()
 
 	//拷贝到内存中
 	int nDeviceID = GetDlgItemInt(CS_IDC_STATIC_DEVICE_ID);
-	memcpy(m_DALIDeviceArray[nDeviceID].cInfo, cBuf, INFO_SIZE+1);
+	memcpy(m_DALIDeviceArray[nDeviceID].cInfo, cBuf, INFO_SIZE + 1);
+	
+
+	memset(cBuf, 0, sizeof(cBuf));
 	//显示信息
 	ShowEdit(nDeviceID);
 

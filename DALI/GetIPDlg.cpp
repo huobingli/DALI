@@ -102,10 +102,10 @@ BOOL CGetIPDlg::OnInitDialog()
 	m_ListCtrl.InsertColumn(2, "Ö÷»úID", LVCFMT_CENTER, 100);
 
 	
-	/*m_ListCtrl.InsertItem(0, "123.123.0.123");
+	m_ListCtrl.InsertItem(0, "123.123.0.123");
 	m_ListCtrl.SetItemText(0, 1, "123");
 	m_ListCtrl.SetItemText(0, 2, "BB122112");
-	m_ListCtrl.InsertItem(1, "123.123.0.123");
+	/*m_ListCtrl.InsertItem(1, "123.123.0.123");
 	m_ListCtrl.SetItemText(1, 1, "123");
 	m_ListCtrl.SetItemText(1, 2, "CB123412");
 	m_ListCtrl.InsertItem(2, "123.123.0.123");

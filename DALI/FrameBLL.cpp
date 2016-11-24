@@ -736,7 +736,7 @@ void CFrameBLL::readCtrlSaveConf(_device_command *pCPC, char*buffer) {
 
 	cacheNode *tempCacheNode = new cacheNode();
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x8e, tempCacheNode);
-	tempCacheNode->getbuffer(buffer, 32);
+	tempCacheNode->getbuffer(buffer, 15);
 
 	delete tempCacheNode;
 	tempCacheNode = NULL;
