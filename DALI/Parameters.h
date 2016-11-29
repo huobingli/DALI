@@ -44,13 +44,6 @@ private:
 	CComboBox		m_ComboGroup;			//组播组合框控件对象
 	CComboBox		m_ComboTargetAddr;		//单播组合框控件对象								
 	EDIT			m_Edit[6];				//编辑框数组
-											
-	//CEdit			m_EditPowerOnLevel;		[0]									
-	//CEdit			m_EditSystemFailure;	[1]
-	//CEdit			m_MinLevel;				[2]
-	//CEdit			m_MaxLevel;				[3]
-	//CEdit			m_FadeRate;				[4]
-	//CEdit			m_FadeTime;				[5]
 private:
 	void ShowEdit(unsigned char* cBuf);
 };

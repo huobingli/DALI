@@ -921,6 +921,7 @@ void CConsole::OnBnScanDevice()
 	//memcpy(pConsoleCommand->oDeviceArray, m_DALIDeviceArray, sizeof(m_DALIDeviceArray));
 	
 	//huobingli
+	//发送参数到BLL层进行处理，返回buffer用于返回到界面的数据
 	m_FrameUI->sendScan(pConsoleCommand, (char*)buffer);
 	//huobingli
 	
@@ -940,14 +941,17 @@ void CConsole::OnBnScanDevice()
 		char* cVal = sVal.GetBuffer();
 		totalNum = totalNum + UpdateTag(cVal, i);
 	}
+	//获取下拉框的值
 	m_FrameUI->setDeviceNum(totalNum);
-
+	//设置下拉框的值
 	for (int i = 0; i < totalNum; i++) {
 		_itoa_s(i, (char*)buffer, sizeof(buffer), 10);
 		m_ComboTargetAddr.InsertString(i, (char*)buffer);
 	}
 	//m_ComboGroup.set
+	//显示设备
 	ShowDALIDevice();
+	//如果在下拉框中有值，将第一个值置为默认值
 	if(m_ComboTargetAddr.GetCount()!= 0)
 		m_ComboTargetAddr.SetCurSel(0);
 	m_FrameUI->setStatusBar("扫描设备完成");

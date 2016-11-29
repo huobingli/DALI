@@ -30,7 +30,7 @@ CFrameBLL::CFrameBLL()
 	//test
 	//后台启动线程进行扫描
 	//handleScan = CreateThread(NULL, 0, scan, m_argScan, NULL, 0);
-	SuspendThread(handleScan);
+	//SuspendThread(handleScan);
 }
 
 
@@ -89,10 +89,14 @@ int CFrameBLL::scanDevice(_getdevice_info *pGI, int deviceNum) {
 
 	Sleep(5000);
 
+	
+
 	//返回上一级界面
 	//定义一个变量接收主机个数
 	int ideviceNum = deviceNum;
 	cacheNode *tempCacheNode = new cacheNode();
+
+	//获取到的个数
 	int DALINUM = analCacheTable->getNodeNum(0x81);
 	for (int i = 0; i < DALINUM; i++) {
 		m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x81, tempCacheNode);
@@ -149,12 +153,6 @@ int CFrameBLL::analyze(cacheNode *pCacheNode, int length, _getdevice_info *pGI, 
 			increaseNum++;
 		}
 		//如果有数据，进行遍历，判断是否有重复数据
-		/*
-		pCacheNode->getIP(pGI[deviceNum].cIP);
-		memcpy(&pGI[deviceNum].cDeviceID, pid, 8);
-		memcpy(&pGI[deviceNum].cDeviceName, (buffer + 2 + i * 22 + 5), 16);
-		deviceNum++;
-		*/
 		else {
 			//开始遍历
 			for (int j = 0; j < deviceNum; j++) {
@@ -223,6 +221,50 @@ char *CFrameBLL::change(char src[], char *cache) {
 		}
 	}
 	return cache;
+}
+
+
+void CFrameBLL::sendTParamSaveConf(_tparameters_command *pTC) {
+	memset(m_SendCache, 0, sizeof(m_SendCache)); 
+
+
+}
+
+void CFrameBLL::readTParamSaveConf(_tparameters_command *pTC, char *buffer) {
+	memset(m_SendCache, 0, sizeof(m_SendCache));
+	
+	//通过messagePackage打包得到SendCache发送缓存
+	int length = m_MessagePackage->App_WifiSendFormat(
+		m_SendCache,
+		5,
+		/*1,*/ 0x05,
+		//主机ID
+		4, pTC->DeviceID,
+		//主机密码
+		16, pTC->DevicePWD,
+		//
+		1, &(char)(pTC->cMode),
+		1, &(pTC->nCommand)
+		);
+
+	//发送查询buffer
+	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
+
+	Sleep(3000);
+	
+	//建立
+	cacheNode *tempCacheNode = new cacheNode();
+	for (int i = 0; i < 3; i++) {
+		m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x8e, tempCacheNode);
+		Sleep(1000);
+	}
+	if (tempCacheNode->getLength() != 0) {
+		tempCacheNode->getbuffer(buffer, 32);
+	}
+
+	delete tempCacheNode;
+	tempCacheNode = NULL;
+
 }
 
 

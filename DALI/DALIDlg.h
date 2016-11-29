@@ -9,6 +9,7 @@
 #include "Sence.h"
 #include "Parameters.h"
 #include "ControllerShow.h"
+#include "TParameters.h"
 
 #include <conio.h>
 
@@ -47,22 +48,16 @@ public:
 	
 private:
 	CTabCtrl			m_TabCtrl;
-	//CShow		 		m_ShowDlg;
-	/*CConsole			m_ConsoleDlg;
-	CGroup				m_GroupDlg;
-	CSence				m_SenceDlg;
-	CParameters			m_ParameterDlg;*/
-	//CControllerParam	m_ControllerParamDlg;
+	
+	CFrameUI			*m_FrameUI;
+	CTParameters		*m_TParameterDlg;
+	CConsole			*m_ConsoleDlg;
+	CGroup				*m_GroupDlg;
+	CSence				*m_SenceDlg;
+	CParameters			*m_ParameterDlg;
 	CControllerShow		*m_ControllerShowDlg;
-	//CFrameUI			*m_FrameUI;
-	CFrameUI *m_FrameUI;
-	CConsole *m_ConsoleDlg;
-	CGroup *m_GroupDlg;
-	CSence *m_SenceDlg;
-	CParameters *m_ParameterDlg;
 	CStatic				m_IP;
 	
-	//CStatusBarCtrl		m_StatusBarCtrl;
 public:
 	CString				m_sIP;
 	CString				m_sPass;

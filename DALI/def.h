@@ -16,8 +16,8 @@
 #define OSU								0x08		//OSU
 #define SDO								0x07		//SDO
 
-//#define DIRECT							0xDE		//直接控制亮度
-#define	DALI_DEVICE_NUM					64	//DALI设备数量
+//#define DIRECT						0xDE		//直接控制亮度
+#define	DALI_DEVICE_NUM					64			//DALI设备数量
 /*Group宏定义*/
 #define GROUP_NUM						16
 #define GROUP_SAVECONFIG				0x10		//Group保存配置
@@ -71,8 +71,13 @@ struct _getdevice_info{
 	char cDeviceName[20];
 };
 
-
-
+typedef struct _tparameters_command {
+	char cMode;
+	int nCommand;
+	
+	unsigned char DeviceID[4];
+	unsigned char DevicePWD[16];
+};
 
 
 /*console 结构体*/

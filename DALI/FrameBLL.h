@@ -129,6 +129,11 @@ public:
 	char *change(char src[], char *cache);
 
 	//void insertORno();
+	//TParameter
+
+	void sendTParamSaveConf(_tparameters_command *pTC);
+
+	void readTParamSaveConf(_tparameters_command *pTC, char *buffer);
 
 	//console
 	//发送普通参数命令
@@ -137,7 +142,7 @@ public:
 	//发送扫描命令
 	void sendScan(_console_command *pCC, char *buffer);
 
-	void CFrameBLL::detectScan(_console_command *pCC, char *buffer);
+	void detectScan(_console_command *pCC, char *buffer);
 
 	void sendChangeLightness(_console_command *pCC);
 

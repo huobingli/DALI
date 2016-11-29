@@ -26,7 +26,7 @@ CGroup::~CGroup()
 void CGroup::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_COMBO_GROUP_ADDRESS, m_ComboBoxAdress);
+	DDX_Control(pDX, GROUP_IDC_COMBO_ADDRESS, m_ComboBoxAdress);
 	DDX_Control(pDX, GROUP_IDC_BUTTON_SAVECONFIG, m_ButtonSaveConfig);
 	DDX_Control(pDX, GROUP_IDC_BUTTON_READCONFIG, m_ButtonReadConfig);
 	DDX_Control(pDX, GROUP_IDC_EDIT_ZEROSEVEN, m_EditLeft);

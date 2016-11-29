@@ -87,6 +87,9 @@
     <ClInclude Include="GetIPDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TParameters.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DALI.cpp">
@@ -147,6 +150,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="GetIPDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TParameters.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

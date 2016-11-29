@@ -2,9 +2,6 @@
 
 #include "FrameBLL.h"
 
-
-
-
 static DWORD WINAPI Update(LPVOID pM) {
 	struct _update_parameters *arg = (struct _update_parameters*)pM;
 
@@ -51,6 +48,15 @@ public:
 	//getIPDlg
 	int scanDevice(_getdevice_info *pGI, int deviceNum) {
 		return m_FrameBLL->scanDevice(pGI, deviceNum);
+	}
+
+	//TParameters
+	void sendTParamSaveConf(_tparameters_command *pTC) {
+		m_FrameBLL->sendTParamSaveConf(pTC);
+	}
+
+	void readTParamSaveConf(_tparameters_command *pTC, char *buffer){
+		m_FrameBLL->readTParamSaveConf(pTC, buffer);
 	}
 
 	//consoleDlg
