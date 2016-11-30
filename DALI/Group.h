@@ -43,7 +43,7 @@ public:
 	virtual BOOL OnInitDialog();
 
 private:
-	CFrameUI *m_FrameUI;
+	CFrameUI	*m_FrameUI;
 	CComboBox	m_ComboBoxAdress;
 	GROUP_CHECK m_GroupCheck[GROUP_NUM];
 	CButton		m_ButtonSaveConfig;
@@ -52,7 +52,7 @@ private:
 	CEdit		m_EditRight;			/*Group8-15*/
 
 private:
-	GROUP_CHECK* GetGroupCheckByCtrlID(UINT ID);		//通过控件ID获取单选按钮结构
+	GROUP_CHECK* GetGroupCheckByCtrlID(UINT ID);					//通过控件ID获取单选按钮结构
 	void ConfigIntToString(CString &sLeft, CString &sRight,unsigned char* buf);
 	void StringToConfigInt(CString sLeft, CString sRight, unsigned char* buf);
 	void ShowCheck();

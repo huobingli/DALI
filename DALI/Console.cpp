@@ -43,11 +43,12 @@ CConsole::CConsole(CFrameUI *pUI, CWnd* pParent /*=NULL*/)
 	: CDialogEx(CConsole::IDD, pParent)
 {
 	m_FrameUI = pUI;
+	m_MessageStopScan = new CMessageStopScan();
 }
 
 CConsole::~CConsole()
 {
-
+	delete m_MessageStopScan;
 }
 
 void CConsole::DoDataExchange(CDataExchange* pDX)
@@ -100,10 +101,6 @@ END_MESSAGE_MAP()
 
 
 // CConsole 消息处理程序
-
-void CConsole::OnOk()
-{}
-
 BOOL CConsole::PreTranslateMessage(MSG* pMsg)
 {
 	/*屏蔽ESC关闭窗口*/
@@ -898,18 +895,15 @@ void CConsole::OnBnScanDevice()
 		cacheNode *pcacheNode = new cacheNode();
 		pcacheNode->setbuffer(message.GetBuffer(), 15);
 		m_FrameUI->insertNode(pcacheNode);
-		pcacheNode->setLength(1000);
-			
+		pcacheNode->setLength(1000);	
 	}
 	
 	//huobingli
 	CONSOLE_COMMAND *pConsoleCommand = new CONSOLE_COMMAND();
-
 	pConsoleCommand->nCommand = 0x03;
-
 	pConsoleCommand->pStatusBarCtrl = m_FrameUI->getStatusBarCtrl();
 
-
+	pConsoleCommand->pMessageStopScan = m_MessageStopScan;
 
 	unsigned char buffer[20];
 	memset(buffer, 0, sizeof(buffer));
@@ -918,18 +912,36 @@ void CConsole::OnBnScanDevice()
 	memcpy(pConsoleCommand->DeviceID, m_FrameUI->DeviceID, 4);
 	memcpy(pConsoleCommand->DevicePWD, m_FrameUI->DevicePWD, 16);
 
-	//memcpy(pConsoleCommand->oDeviceArray, m_DALIDeviceArray, sizeof(m_DALIDeviceArray));
-	
 	//huobingli
+	
 	//发送参数到BLL层进行处理，返回buffer用于返回到界面的数据
 	m_FrameUI->sendScan(pConsoleCommand, (char*)buffer);
 	//huobingli
-	
 
+	/*
+	_scan *pScan = (_scan*)malloc(sizeof(pScan));
+	pScan->pMSS = m_MessageStopScan;
+	pScan->pSBC = m_FrameUI->getStatusBarCtrl();
+	pScan->pAnalCacheTable = analCacheTable;
+	handleScan = CreateThread(NULL, 0, Scan, pScan, NULL, 0);
+	//hRequestExitEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	//出现弹框等待弹框
+	//表示用户按键返回，线程自动退出
+	if (m_MessageStopScan->DoModal() == IDOK) {
+		m_FrameUI->setStatusBar("搜索完成！！"); 
+		//去取数据
+	}
+	else {
+		m_FrameUI->setStatusBar("已取消搜索！！");
+	}
+	//释放线程参数
+	//free(pScan);
 	//删除传参对象
+	*/
 	delete pConsoleCommand;
 	pConsoleCommand = NULL;
-	
+
+	//显示数据
 	//buffer[0] = 0xff;
 	int totalNum = 0;
 	for (int i = 0; i < 8; ++i)
@@ -941,20 +953,26 @@ void CConsole::OnBnScanDevice()
 		char* cVal = sVal.GetBuffer();
 		totalNum = totalNum + UpdateTag(cVal, i);
 	}
-	//获取下拉框的值
-	m_FrameUI->setDeviceNum(totalNum);
-	//设置下拉框的值
-	for (int i = 0; i < totalNum; i++) {
-		_itoa_s(i, (char*)buffer, sizeof(buffer), 10);
-		m_ComboTargetAddr.InsertString(i, (char*)buffer);
+	if (totalNum != 0) {
+		//获取下拉框的值
+		m_FrameUI->setDeviceNum(totalNum);
+		//设置下拉框的值
+		for (int i = 0; i < totalNum; i++) {
+			_itoa_s(i, (char*)buffer, sizeof(buffer), 10);
+			m_ComboTargetAddr.InsertString(i, (char*)buffer);
+		}
+		//m_ComboGroup.set
+		//显示设备
+		ShowDALIDevice();
+		//如果在下拉框中有值，将第一个值置为默认值
+		if (m_ComboTargetAddr.GetCount() != 0)
+			m_ComboTargetAddr.SetCurSel(0);
+		m_FrameUI->setStatusBar("扫描设备完成");
 	}
-	//m_ComboGroup.set
-	//显示设备
-	ShowDALIDevice();
-	//如果在下拉框中有值，将第一个值置为默认值
-	if(m_ComboTargetAddr.GetCount()!= 0)
-		m_ComboTargetAddr.SetCurSel(0);
-	m_FrameUI->setStatusBar("扫描设备完成");
+	else {
+		m_FrameUI->setStatusBar("没有扫描到设备");
+	}
+	
 }
 /*功能：点击按钮检测设备*/
 void CConsole::OnBnDetectDevice()

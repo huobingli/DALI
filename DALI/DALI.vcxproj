@@ -115,18 +115,20 @@
     <ClInclude Include="FrameUI.h" />
     <ClInclude Include="Function.h" />
     <ClInclude Include="GetIPDlg.h" />
+    <ClInclude Include="GlobalGroup.h" />
     <ClInclude Include="Group.h" />
     <ClInclude Include="LoginDlg.h" />
     <ClInclude Include="MessageCommand.h" />
     <ClInclude Include="MessagePackage.h" />
+    <ClInclude Include="MessageStopScan.h" />
     <ClInclude Include="Parameters.h" />
+    <ClInclude Include="Public.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Sence.h" />
     <ClInclude Include="Show.h" />
     <ClInclude Include="SocketMessage.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="TParameters.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnalyzeMessage.cpp" />
@@ -140,11 +142,14 @@
     <ClCompile Include="FrameUI.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="GetIPDlg.cpp" />
+    <ClCompile Include="GlobalGroup.cpp" />
     <ClCompile Include="Group.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="MessageCommand.cpp" />
     <ClCompile Include="MessagePackage.cpp" />
+    <ClCompile Include="MessageStopScan.cpp" />
     <ClCompile Include="Parameters.cpp" />
+    <ClCompile Include="Public.cpp" />
     <ClCompile Include="Sence.cpp" />
     <ClCompile Include="Show.cpp" />
     <ClCompile Include="SocketMessage.cpp" />
@@ -152,7 +157,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TParameters.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DALI.rc" />

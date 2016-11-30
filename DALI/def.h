@@ -1,4 +1,7 @@
 #pragma once
+#include "MessageStopScan.h"
+
+
 //自定义结构体，宏命令
 /*宏定义*/
 #define BROADCAST_MODE					0xFF		//广播模式
@@ -71,12 +74,13 @@ struct _getdevice_info{
 	char cDeviceName[20];
 };
 
-typedef struct _tparameters_command {
-	char cMode;
-	int nCommand;
+typedef struct _globalgroup_command {
+	unsigned char	cMode;
+	unsigned char	cBuf[3];
+	unsigned char	cCommand;
 	
-	unsigned char DeviceID[4];
-	unsigned char DevicePWD[16];
+	unsigned char	DeviceID[4];
+	unsigned char	DevicePWD[16];
 };
 
 
@@ -96,7 +100,7 @@ typedef struct _console_command
 	unsigned char DevicePWD[16];
 	
 	CStatusBarCtrl *pStatusBarCtrl;
-	_dali_device  oDeviceArray[64];
+	CMessageStopScan *pMessageStopScan;
 }CONSOLE_COMMAND, *PCONSOLE_COMMAND;
 
 typedef struct _status

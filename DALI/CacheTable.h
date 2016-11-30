@@ -288,6 +288,7 @@ public:
 		pDeleteNode = NULL;
 	}
 
+	//查找元素，通过buffer是否相同来判断
 	bool findElement(char *pCacheBuffer) {
 		cacheNode *pScanNode;
 		pScanNode = m_HeadNode;
@@ -315,7 +316,7 @@ public:
 	}
 
 
-	//扫描线程使用
+	//扫描线程使用，返回相同节点个数
 	int scanNode(int operate) {
 		int nodeNum = 0;
 		cacheNode *tempNode = m_HeadNode;
@@ -334,6 +335,10 @@ public:
 
 		return nodeNum;
 	}
+
+	/* scanNode(int operate) {
+
+	}*/
 
 };
 

@@ -9,7 +9,7 @@
 #include "Sence.h"
 #include "Parameters.h"
 #include "ControllerShow.h"
-#include "TParameters.h"
+#include "GlobalGroup.h"
 
 #include <conio.h>
 
@@ -50,7 +50,7 @@ private:
 	CTabCtrl			m_TabCtrl;
 	
 	CFrameUI			*m_FrameUI;
-	CTParameters		*m_TParameterDlg;
+	CGlobalGroup		*m_GlobalGroup;
 	CConsole			*m_ConsoleDlg;
 	CGroup				*m_GroupDlg;
 	CSence				*m_SenceDlg;

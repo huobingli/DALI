@@ -25,7 +25,7 @@ CFrameUI::CFrameUI()
 	//²Ù×÷×´Ì¬À¸Ö¸Õë
 	m_argUpdate->pStatusBarCtrl = m_StatusBarCtrl;
 
-	handleUpdate = CreateThread(NULL, 0, Update, m_argUpdate, NULL, 0);
+	//handleUpdate = CreateThread(NULL, 0, Update, m_argUpdate, NULL, 0);
 }
 
 

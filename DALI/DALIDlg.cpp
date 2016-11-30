@@ -62,7 +62,7 @@ CDALIDlg::CDALIDlg(CFrameUI *pUI, CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_FrameUI = pUI;
 	//pUI->changeIP(m_sIP);
-	m_TParameterDlg = new CTParameters(m_FrameUI);
+	m_GlobalGroup = new CGlobalGroup(m_FrameUI);
 	m_ConsoleDlg = new CConsole(m_FrameUI);
 	m_GroupDlg = new CGroup(m_FrameUI);
 	m_SenceDlg = new CSence(m_FrameUI);
@@ -71,13 +71,13 @@ CDALIDlg::CDALIDlg(CFrameUI *pUI, CWnd* pParent /*=NULL*/)
 }
 
 CDALIDlg::~CDALIDlg() {
-	delete m_FrameUI;
+	//delete m_FrameUI;
 	delete m_ConsoleDlg;
 	delete m_GroupDlg;
 	delete m_SenceDlg;
 	delete m_ParameterDlg;
 	delete m_ControllerShowDlg;
-	delete m_TParameterDlg;
+	delete m_GlobalGroup;
 }
 
 void CDALIDlg::DoDataExchange(CDataExchange* pDX)
@@ -157,7 +157,7 @@ BOOL CDALIDlg::OnInitDialog()
 	
 	
 	//m_ShowDlg.Create(IDD_DIALOG0_SHOW, &m_TabCtrl);
-	m_TParameterDlg->Create(IDD_DIALOG_TPARAMETER, &m_TabCtrl);
+	m_GlobalGroup->Create(IDD_DIALOG_TPARAMETER, &m_TabCtrl);
 	m_ConsoleDlg->Create(IDD_DIALOG_CONSOLE, &m_TabCtrl);
 	m_GroupDlg->Create(IDD_DIALOG_GROUP, &m_TabCtrl);
 	m_SenceDlg->Create(IDD_DIALOG_SENCE, &m_TabCtrl);
@@ -173,7 +173,7 @@ BOOL CDALIDlg::OnInitDialog()
 	rc.left += 0;
 	rc.right -= 0;
 	//m_ShowDlg.MoveWindow(&rc);
-	m_TParameterDlg->MoveWindow(&rc);
+	m_GlobalGroup->MoveWindow(&rc);
 	m_ConsoleDlg->MoveWindow(&rc);
 	m_GroupDlg->MoveWindow(&rc);
 	m_SenceDlg->MoveWindow(&rc);
@@ -182,7 +182,7 @@ BOOL CDALIDlg::OnInitDialog()
 	//m_ControllerParamDlg.MoveWindow(&rc);
 
 	m_TabCtrl.SetCurSel(0);
-	m_TParameterDlg->ShowWindow(true);
+	m_GlobalGroup->ShowWindow(true);
 	//m_ShowDlg.ShowWindow(true);
 
 
@@ -254,7 +254,7 @@ void CDALIDlg::OnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 	case 0:
 		//m_ShowDlg.ShowWindow(true);
-		m_TParameterDlg->ShowWindow(true);
+		m_GlobalGroup->ShowWindow(true);
 		m_ConsoleDlg->ShowWindow(false);
 		m_GroupDlg->ShowWindow(false);
 		m_SenceDlg->ShowWindow(false);
@@ -265,7 +265,7 @@ void CDALIDlg::OnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	case 1:
 		//m_ShowDlg.ShowWindow(false);
-		m_TParameterDlg->ShowWindow(false);
+		m_GlobalGroup->ShowWindow(false);
 		m_ConsoleDlg->ShowWindow(true);
 		m_GroupDlg->ShowWindow(false);
 		m_SenceDlg->ShowWindow(false);
@@ -276,7 +276,7 @@ void CDALIDlg::OnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	case 2:
 		//m_ShowDlg.ShowWindow(false);
-		m_TParameterDlg->ShowWindow(false);
+		m_GlobalGroup->ShowWindow(false);
 		m_ConsoleDlg->ShowWindow(false);
 		m_GroupDlg->ShowWindow(true);
 		m_SenceDlg->ShowWindow(false);
@@ -287,7 +287,7 @@ void CDALIDlg::OnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	case 3:
 		//m_ShowDlg.ShowWindow(false);
-		m_TParameterDlg->ShowWindow(false);
+		m_GlobalGroup->ShowWindow(false);
 		m_ConsoleDlg->ShowWindow(false);
 		m_GroupDlg->ShowWindow(false);
 		m_SenceDlg->ShowWindow(true);
@@ -298,7 +298,7 @@ void CDALIDlg::OnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	case 4:
 		//m_ShowDlg.ShowWindow(false);
-		m_TParameterDlg->ShowWindow(false);
+		m_GlobalGroup->ShowWindow(false);
 		m_ConsoleDlg->ShowWindow(false);
 		m_GroupDlg->ShowWindow(false);
 		m_SenceDlg->ShowWindow(false);
@@ -308,7 +308,7 @@ void CDALIDlg::OnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 		//m_ControllerParamDlg.ShowWindow(false);
 		break;
 	case 5:
-		m_TParameterDlg->ShowWindow(false);
+		m_GlobalGroup->ShowWindow(false);
 		m_ConsoleDlg->ShowWindow(false);
 		m_GroupDlg->ShowWindow(false);
 		m_SenceDlg->ShowWindow(false);

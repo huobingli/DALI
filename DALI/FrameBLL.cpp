@@ -36,6 +36,8 @@ CFrameBLL::CFrameBLL()
 
 CFrameBLL::~CFrameBLL()
 {
+	//退出接收和处理线程
+	CPublic::quitThreadFlag = 1;
 	delete m_SocketMessage;
 	delete m_MessagePackage;
 	delete recvCacheTable;
@@ -88,8 +90,6 @@ int CFrameBLL::scanDevice(_getdevice_info *pGI, int deviceNum) {
 	m_SocketMessage->broadBuffer((char*)m_SendCache, length);
 
 	Sleep(5000);
-
-	
 
 	//返回上一级界面
 	//定义一个变量接收主机个数
@@ -223,28 +223,42 @@ char *CFrameBLL::change(char src[], char *cache) {
 	return cache;
 }
 
-
-void CFrameBLL::sendTParamSaveConf(_tparameters_command *pTC) {
+//0x11
+void CFrameBLL::sendGlobalGroupSaveConf(_globalgroup_command *pGG) {
 	memset(m_SendCache, 0, sizeof(m_SendCache)); 
+	int length = m_MessagePackage->App_WifiSendFormat(
+		m_SendCache,
+		5,
+		/*1,*/ pGG->cCommand,//0x11
+		//主机ID
+		4, pGG->DeviceID,
+		//主机密码
+		16, pGG->DevicePWD,
+		//
+		1, &(pGG->cMode),
+		2, &(pGG->cBuf)
+		);
 
+	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 
 }
 
-void CFrameBLL::readTParamSaveConf(_tparameters_command *pTC, char *buffer) {
+//0x12
+void CFrameBLL::readGlobalGroupSaveConf(_globalgroup_command *pGG, char *buffer) {
 	memset(m_SendCache, 0, sizeof(m_SendCache));
 	
 	//通过messagePackage打包得到SendCache发送缓存
 	int length = m_MessagePackage->App_WifiSendFormat(
 		m_SendCache,
-		5,
-		/*1,*/ 0x05,
+		3,
+		/*1,*/ pGG->cCommand,//0x12
 		//主机ID
-		4, pTC->DeviceID,
+		4, pGG->DeviceID,
 		//主机密码
-		16, pTC->DevicePWD,
+		16, pGG->DevicePWD,
 		//
-		1, &(char)(pTC->cMode),
-		1, &(pTC->nCommand)
+		1, &(pGG->cMode)
+		//2, &(pGG->cBuf)
 		);
 
 	//发送查询buffer
@@ -252,21 +266,15 @@ void CFrameBLL::readTParamSaveConf(_tparameters_command *pTC, char *buffer) {
 
 	Sleep(3000);
 	
-	//建立
+	Sleep(2000);
+
 	cacheNode *tempCacheNode = new cacheNode();
-	for (int i = 0; i < 3; i++) {
-		m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x8e, tempCacheNode);
-		Sleep(1000);
-	}
-	if (tempCacheNode->getLength() != 0) {
-		tempCacheNode->getbuffer(buffer, 32);
-	}
+	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x92, tempCacheNode);
+	tempCacheNode->getbuffer(buffer, 3);
 
 	delete tempCacheNode;
 	tempCacheNode = NULL;
-
 }
-
 
 //发送普通参数命令 
 //开关调亮调暗
@@ -327,7 +335,6 @@ void CFrameBLL::sendConsoleParameters(_console_command *pCC) {
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 }
 
-
 //发送扫描命令
 void CFrameBLL::sendScan(_console_command *pCC, char *buffer) {
 
@@ -354,14 +361,27 @@ void CFrameBLL::sendScan(_console_command *pCC, char *buffer) {
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 
 	
+	_scan *pScan = (_scan*)malloc(sizeof(pScan));
+	pScan->pMSS = pCC->pMessageStopScan;
+	pScan->pSBC = pCC->pStatusBarCtrl;
+	pScan->pAnalCacheTable = analCacheTable;
+	handleScan = CreateThread(NULL, 0, Scan, pScan, NULL, 0);
+	//hRequestExitEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	//出现弹框等待弹框
+	//表示用户按键返回，线程自动退出
+	if (pScan->pMSS->DoModal() == IDOK) {
+		pScan->pSBC->SetText("搜索完成！！", 0, 0);
+		//去取数据
+	}
+	else {
+		pScan->pSBC->SetText("已取消搜索！！", 0, 0);
+	}
+
+
 	//end test
-	
-	//AfxMessageBox(dw);
+	//pCC->pMessageStopScan->DoModel();
 
-	//memcpy(m_argScan->pDeviceBtn, pCC->oDeviceArray, sizeof(pCC->oDeviceArray));
-	//handleScan线程恢复
-	ResumeThread(handleScan);
-
+	/*
 	//线程搜索倒计时
 	CString head = "扫描倒计时 ";
 	CString end = " 秒";
@@ -371,29 +391,26 @@ void CFrameBLL::sendScan(_console_command *pCC, char *buffer) {
 		pCC->pStatusBarCtrl->SetText(message, 0, 0);
 		Sleep(1000);
 	}
-
+	*/
 	 
-	//10s线程等待
-	//CloseHandle(handleScan);
 
+	/*
 	DWORD dw = WaitForSingleObject(handleScan, 10000);
 	
 	//handleScan线程挂起
 	SuspendThread(handleScan);
-
+	*/
+	/*
 	cacheNode *tempCacheNode = new cacheNode();
 	//返回上一级界面
  	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x83, tempCacheNode);
 	tempCacheNode->getbuffer(buffer, 20);
 
 	delete tempCacheNode;
-	tempCacheNode = NULL;
+	tempCacheNode = NULL;*/
 }
 
-//static DWORD WINAPI wait(LPVOID arg) {
-	
-//}
-
+//0x03
 void CFrameBLL::detectScan(_console_command *pCC, char *buffer) {
 	memset(m_SendCache, 0, sizeof(m_SendCache));
 
@@ -433,8 +450,7 @@ void CFrameBLL::detectScan(_console_command *pCC, char *buffer) {
 	tempCacheNode = NULL;
 }
 
-
-
+//0x05
 void CFrameBLL::sendChangeLightness(_console_command *pCC) {
 	memset(m_SendCache, 0, sizeof(m_SendCache));
 	
@@ -490,7 +506,7 @@ void CFrameBLL::sendGroupSaveConf(_config_info *pCI) {
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 }
 
-//0x0C 读取Group的配置
+//0x0c 读取Group的配置
 void CFrameBLL::readGroupSaveConf(_config_info *pCI, char *buffer) {
 	memset(m_SendCache, 0, sizeof(m_SendCache));
 
@@ -524,7 +540,6 @@ void CFrameBLL::readGroupSaveConf(_config_info *pCI, char *buffer) {
 	delete tempCacheNode;
 	tempCacheNode = NULL;
 }
-
 
 //0x0a 保存Sence的配置
 void CFrameBLL::sendSenceSaveConf(_sence_command *pSC) {
@@ -622,7 +637,6 @@ void CFrameBLL::readSenceSaveConf(_sence_command *pSC, char *buffer) {
 	tempCacheNode = NULL;
 }
 
-
 //0x0b 保存Param的配置
 void CFrameBLL::sendParamSaveConf(_param_command *pPC, char *buffer) {
 
@@ -682,7 +696,6 @@ void CFrameBLL::sendParamSaveConf(_param_command *pPC, char *buffer) {
 
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 }
-
 
 //0x0e 读取Param的配置
 void CFrameBLL::readParamSaveConf(_param_command *pPC, char *buffer) {
@@ -753,7 +766,6 @@ void CFrameBLL::sendCtrlSaveConf(_device_command *pCPC, char*buffer) {
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 }
 
-
 //0x10 ctrl show读取配置
 void CFrameBLL::readCtrlSaveConf(_device_command *pCPC, char*buffer) {
 
@@ -784,8 +796,7 @@ void CFrameBLL::readCtrlSaveConf(_device_command *pCPC, char*buffer) {
 	tempCacheNode = NULL;
 }
 
-
-//0x03 ctrl show 扫描控制器
+//0x04 ctrl show 扫描控制器
 void CFrameBLL::scanCtrlDevice(_device_command *pCPC, char*buffer) {
 
 	memset(m_SendCache, 0, sizeof(m_SendCache));

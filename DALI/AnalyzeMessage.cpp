@@ -31,6 +31,16 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 	//创建处理缓存的buffer
 	//cacheNode *analNode = new cacheNode();
 	switch (recvBuffer[5] & 0xFF){
+		case 0x00:{
+			analNode->setOperate(0x00);
+			analNode->setst(recvNode->getst());
+			analNode->setLength(recvNode->getLength());
+			//---------------------------需要确定
+			changeBuffer(recvBuffer, 12, (int)recvBuffer[11], analbuffer);
+			analNode->setbuffer(analbuffer, (int)recvBuffer[11]);
+			//---------------------------需要确定
+			analCacheTable->insertNode(analNode);
+		}
 		//recv scan device message
 		case 0x83: {
 			//获得设备数目	;
@@ -126,6 +136,21 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			changeBuffer(recvBuffer, 12, (int)recvBuffer[11], analbuffer);
 			//传入需要返回的参数
 			analNode->setbuffer(analbuffer, 14);
+			//放入分析缓存
+			analCacheTable->insertNode(analNode);
+			break;
+		}
+
+		case 0x91:{
+			//获得设备数目	;
+			analNode->setOperate(0x91);
+			analNode->setst(recvNode->getst());
+
+			//通过change,得到有用的信息
+			changeBuffer(recvBuffer, 14, (int)recvBuffer[13], analbuffer);
+			//传入需要返回的参数
+			analNode->setbuffer(analbuffer, (int)recvBuffer[13]);
+			analNode->setLength(2);
 			//放入分析缓存
 			analCacheTable->insertNode(analNode);
 			break;

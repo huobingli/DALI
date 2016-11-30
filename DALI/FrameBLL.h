@@ -129,11 +129,11 @@ public:
 	char *change(char src[], char *cache);
 
 	//void insertORno();
-	//TParameter
 
-	void sendTParamSaveConf(_tparameters_command *pTC);
+	//GlobalGroup
+	void sendGlobalGroupSaveConf(_globalgroup_command *pGG);
 
-	void readTParamSaveConf(_tparameters_command *pTC, char *buffer);
+	void readGlobalGroupSaveConf(_globalgroup_command *pGG, char *buffer);
 
 	//console
 	//发送普通参数命令

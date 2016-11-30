@@ -3,9 +3,46 @@
 #include "FrameUI.h"
 #include "crtdefs.h"
 #include "def.h"
+#include "MessageStopScan.h"
+
 using namespace std;
 
+//extern int triggerFlag;
 
+//static HANDLE handleScan;
+/*
+struct _scan{
+	CMessageStopScan *pMSS;
+	CStatusBarCtrl *pSBC;
+	CCacheTable *pAnalCacheTable;
+};
+
+static DWORD WINAPI Scan(LPVOID pM) {
+	
+	_scan *arg = (_scan*)pM;
+	//退出线程方式
+	//1、用户点击取消按钮，线程break。
+	//2、搜索超时，自动退出。
+	CString status;
+	CString head = "已经找到 ";
+	CString end = " 个主机";
+	for (int i = 0; i < 10; i++) {
+		//用户没有按下取消按钮，线程继续执行
+		if (CPublic::triggerFlag == 0) {
+			//搜索分析队列中的操作为0x83的元素，获取里面的
+			arg->pAnalCacheTable->scanNode(0x83);
+			Sleep(500);
+		}
+		else {
+			return 0;
+		}
+	}
+	//CPublic::readyFlag = 1;
+	//执行完毕，关闭对话框
+	arg->pMSS->EndDialog(IDCANCEL);
+	return 0;
+}
+*/
 
 // CConsole 对话框
 class CConsole : public CDialogEx
@@ -15,7 +52,7 @@ class CConsole : public CDialogEx
 public:
 	CConsole(CFrameUI * pUI, CWnd* pParent = NULL);   // 标准构造函数
 
-	virtual void OnOk();
+	//virtual void OnOk();
 	virtual ~CConsole();
 
 // 对话框数据
@@ -47,6 +84,8 @@ private:
 	CEdit		m_EditTimeInterval;					//自动场景时间间隔
 	//DALI_DEVICE	m_DALIDeviceArray[DALI_DEVICE_NUM];	//DALI设备数组
 
+
+	CMessageStopScan *m_MessageStopScan;
 	CSliderCtrl		m_SliderCtrlConsole;	//滑动条控件对象
 
 public:

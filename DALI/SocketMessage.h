@@ -7,6 +7,7 @@
 #include "CacheTable.h"
 #include "def.h"
 
+
 using namespace std;
 
 
@@ -45,8 +46,6 @@ typedef struct _thread_parameters{
 	_analyze_parameters *ap;
 };
 
-
-
 //需要将接收队列和处理队列传入进行查询，不改变内容
 typedef struct _scan_parameters{
 	//处理类需要结构
@@ -63,15 +62,50 @@ typedef struct _update_parameters {
 	CStatusBarCtrl *pStatusBarCtrl;
 };
 
+struct _scan{
+	CMessageStopScan *pMSS;
+	CStatusBarCtrl *pSBC;
+	CCacheTable *pAnalCacheTable;
+};
+
 //BLL全局接收线程
 static HANDLE handleRecv;
 static HANDLE handleAnal;
 static HANDLE handleScan;
+
 static HANDLE handleUpdate;
 //static HANDLE handleHeart;
 
 
+static DWORD WINAPI Scan(LPVOID pM) {
 
+	_scan *arg = (_scan*)pM;
+	//退出线程方式
+	//1、用户点击取消按钮，线程break。
+	//2、搜索超时，自动退出。
+	CString status;
+	CString head = "已经找到 ";
+	CString end = " 个主机";
+	cacheNode *pCacheNode = new cacheNode();
+	for (int i = 0; i < 400; i++) {
+		//用户没有按下取消按钮，线程继续执行
+		if (CPublic::triggerFlag == 0) {
+			//搜索分析队列中的操作为0x00的元素，获取里面的
+			arg->pAnalCacheTable->scanTable(0x00, pCacheNode);
+			//取出数据，并显示在状态栏
+			//pCacheNode->
+			Sleep(500);
+		}
+		else {
+			CPublic::triggerFlag = 0;
+			return 0;
+		}
+	}
+	//CPublic::readyFlag = 1;
+	//执行完毕，关闭对话框
+	arg->pMSS->EndDialog(IDOK);
+	return 0;
+}
 
 //接收参数方法
 static DWORD WINAPI Recv(LPVOID pM)

@@ -87,7 +87,13 @@
     <ClInclude Include="GetIPDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TParameters.h">
+    <ClInclude Include="MessageStopScan.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Public.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalGroup.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -152,7 +158,13 @@
     <ClCompile Include="GetIPDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TParameters.cpp">
+    <ClCompile Include="MessageStopScan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalGroup.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

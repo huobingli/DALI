@@ -50,13 +50,13 @@ public:
 		return m_FrameBLL->scanDevice(pGI, deviceNum);
 	}
 
-	//TParameters
-	void sendTParamSaveConf(_tparameters_command *pTC) {
-		m_FrameBLL->sendTParamSaveConf(pTC);
+	//GlobalGroup
+	void sendGlobalGroupSaveConf(_globalgroup_command *pGG) {
+		m_FrameBLL->sendGlobalGroupSaveConf(pGG);
 	}
 
-	void readTParamSaveConf(_tparameters_command *pTC, char *buffer){
-		m_FrameBLL->readTParamSaveConf(pTC, buffer);
+	void readGlobalGroupSaveConf(_globalgroup_command *pGG, char *buffer){
+		m_FrameBLL->readGlobalGroupSaveConf(pGG, buffer);
 	}
 
 	//consoleDlg

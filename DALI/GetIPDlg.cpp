@@ -177,8 +177,6 @@ void CGetIPDlg::showDALIInfo(_getdevice_info* buffer, int deviceNum) {
 		m_ListCtrl.SetItemText(i, 2, buffer[i].cDeviceID);
 	}
 }
-/*
-*/
 
 
 void CGetIPDlg::OnBnClickedIdcButtonClearlist()
