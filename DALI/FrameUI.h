@@ -115,8 +115,8 @@ public:
 		m_FrameBLL->scanCtrlDevice(pCPC, buffer);
 	}
 
-	void detectCtrlDevice() {
-
+	void detectCtrlDevice(_device_command *pCPC, char*buffer) {
+		m_FrameBLL->detectCtrlDevice(pCPC, buffer);
 	}
 
 	int getDeviceNum() {

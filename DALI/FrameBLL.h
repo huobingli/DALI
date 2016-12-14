@@ -47,6 +47,7 @@ typedef struct _sence_command
 	unsigned char DevicePWD[16];
 }SENCE_COMMAND, *PSENCE_COMMAND;
 
+//group结构体
 typedef struct _group_check
 {
 	CButton CheckButton;
@@ -175,12 +176,13 @@ private:
 	CSocketMessage *m_SocketMessage;
 	//
 	CMessagePackage *m_MessagePackage;
+	//sendBuffer
 	uint8_t m_SendCache[256];
 	//socket结构体
 	_socket_parameters *m_argSock;
-
+	//分析模块
 	CAnalyzeMessage *m_AnalyzeMessage;
-
+	//扫描线程函数参数
 	_scan_parameters *m_argScan;
 };
 

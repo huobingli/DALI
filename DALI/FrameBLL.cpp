@@ -99,7 +99,9 @@ int CFrameBLL::scanDevice(_getdevice_info *pGI, int deviceNum) {
 	//获取到的个数
 	int DALINUM = analCacheTable->getNodeNum(0x81);
 	for (int i = 0; i < DALINUM; i++) {
+		WaitForSingleObject(analMutex, 500);
 		m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x81, tempCacheNode);
+		ReleaseMutex(analMutex);
 		
 		//处理函数，将字符串处理成结构体返回
 		//ideviceNum 用来写入到结构体
@@ -255,18 +257,18 @@ void CFrameBLL::readGlobalGroupSaveConf(_globalgroup_command *pGG, char *buffer)
 		//主机ID
 		4, pGG->DeviceID,
 		//主机密码
-		16, pGG->DevicePWD,
+		16, pGG->DevicePWD
 		//
-		1, &(pGG->cMode)
+		//1, &(pGG->cMode)
 		//2, &(pGG->cBuf)
 		);
 
 	//发送查询buffer
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 
-	Sleep(3000);
+	//Sleep(3000);
 	
-	Sleep(2000);
+	Sleep(3000);
 
 	cacheNode *tempCacheNode = new cacheNode();
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x92, tempCacheNode);
@@ -365,6 +367,7 @@ void CFrameBLL::sendScan(_console_command *pCC, char *buffer) {
 	pScan->pMSS = pCC->pMessageStopScan;
 	pScan->pSBC = pCC->pStatusBarCtrl;
 	pScan->pAnalCacheTable = analCacheTable;
+	CPublic::triggerFlag = 0;
 	handleScan = CreateThread(NULL, 0, Scan, pScan, NULL, 0);
 	//hRequestExitEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	//出现弹框等待弹框
@@ -403,11 +406,14 @@ void CFrameBLL::sendScan(_console_command *pCC, char *buffer) {
 	/*
 	cacheNode *tempCacheNode = new cacheNode();
 	//返回上一级界面
+	WaitForSingleObject(analMutex, 500);
  	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x83, tempCacheNode);
-	tempCacheNode->getbuffer(buffer, 20);
+	ReleaseMutex(analMutex);
+	tempCacheNode->getbuffer(buffer, 20);*/
+	memcpy(buffer, DeviceArray, 8);
 
-	delete tempCacheNode;
-	tempCacheNode = NULL;*/
+	//delete tempCacheNode;
+	//tempCacheNode = NULL;
 }
 
 //0x03
@@ -433,7 +439,7 @@ void CFrameBLL::detectScan(_console_command *pCC, char *buffer) {
 
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 
-	Sleep(8000);
+	Sleep(2000);
 
 	cacheNode *tempCacheNode = new cacheNode();
 
@@ -443,7 +449,9 @@ void CFrameBLL::detectScan(_console_command *pCC, char *buffer) {
 	//CloseHandle(WaitHandle);
 
 	//返回上一级界面
+	WaitForSingleObject(analMutex, 500);
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x83, tempCacheNode);
+	ReleaseMutex(analMutex);
 	tempCacheNode->getbuffer(buffer, 20);
 
 	delete tempCacheNode;
@@ -459,6 +467,7 @@ void CFrameBLL::sendChangeLightness(_console_command *pCC) {
 	char command = pCC->nCommand;
 	cBuf[0] = 0xFE;
 	cBuf[1] = pCC->nBrightness * 254 / 100;
+	
 	int length = m_MessagePackage->App_WifiSendFormat(
 		m_SendCache,
 		5,
@@ -534,7 +543,11 @@ void CFrameBLL::readGroupSaveConf(_config_info *pCI, char *buffer) {
 	Sleep(2000);
 
 	cacheNode *tempCacheNode = new cacheNode();
+
+	WaitForSingleObject(analMutex, 500);
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x8c, tempCacheNode);
+	ReleaseMutex(analMutex);
+
 	tempCacheNode->getbuffer(buffer, 3);
 
 	delete tempCacheNode;
@@ -630,7 +643,11 @@ void CFrameBLL::readSenceSaveConf(_sence_command *pSC, char *buffer) {
 	Sleep(3000);
 
 	cacheNode *tempCacheNode = new cacheNode();
+
+	WaitForSingleObject(analMutex, 500);
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x8d, tempCacheNode);
+	ReleaseMutex(analMutex);
+
 	tempCacheNode->getbuffer(buffer, 20);
 
 	delete tempCacheNode;
@@ -737,7 +754,11 @@ void CFrameBLL::readParamSaveConf(_param_command *pPC, char *buffer) {
 	//char pbuffer[32];
 	//memset(pbuffer, 0, sizeof(pbuffer));
 	cacheNode *tempCacheNode = new cacheNode();
+
+	WaitForSingleObject(analMutex, 500);
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x8e, tempCacheNode);
+	ReleaseMutex(analMutex);
+
 	tempCacheNode->getbuffer(buffer, 32);
 
 	delete tempCacheNode;
@@ -789,7 +810,11 @@ void CFrameBLL::readCtrlSaveConf(_device_command *pCPC, char*buffer) {
 	Sleep(3000);
 
 	cacheNode *tempCacheNode = new cacheNode();
-	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x8e, tempCacheNode);
+
+	WaitForSingleObject(analMutex, 500);
+	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x90, tempCacheNode);
+	ReleaseMutex(analMutex);
+
 	tempCacheNode->getbuffer(buffer, 15);
 
 	delete tempCacheNode;
@@ -820,11 +845,48 @@ void CFrameBLL::scanCtrlDevice(_device_command *pCPC, char*buffer) {
 
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 
-	Sleep(5000);
+
+	/*
+	_scan *pScan = (_scan*)malloc(sizeof(pScan));
+	pScan->pMSS = pCC->pMessageStopScan;
+	pScan->pSBC = pCC->pStatusBarCtrl;
+	pScan->pAnalCacheTable = analCacheTable;
+	handleScan = CreateThread(NULL, 0, Scan, pScan, NULL, 0);
+	//hRequestExitEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	//出现弹框等待弹框
+	//表示用户按键返回，线程自动退出
+	if (pScan->pMSS->DoModal() == IDOK) {
+		pScan->pSBC->SetText("搜索完成！！", 0, 0);
+		//去取数据
+	}
+	else {
+		pScan->pSBC->SetText("已取消搜索！！", 0, 0);
+	}*/
+	_scan_control *pScan = (_scan_control*)malloc(sizeof(pScan));
+	pScan->pMSS = pCPC->pMessageStopScan;
+	pScan->pSBC = pCPC->pStatusBarCtrl;
+	pScan->pAnalCacheTable = analCacheTable;
+
+	CPublic::controlFlag = 0;
+	handleScanHandle = CreateThread(NULL, 0, ScanControl, pScan, NULL, 0);
+
+
+	if (pScan->pMSS->DoModal() == IDOK) {
+		pScan->pSBC->SetText("搜索完成！！", 0, 0);
+		//去取数据
+	}
+	else {
+		pScan->pSBC->SetText("已取消搜索！！", 0, 0);
+	}
+	
 
 	//返回上一级界面
 	cacheNode *tempCacheNode = new cacheNode();
+
+	WaitForSingleObject(analMutex, 500);
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x84, tempCacheNode);
+	ReleaseMutex(analMutex);
+
 	tempCacheNode->getbuffer(buffer, 8);
 
 	delete tempCacheNode;
@@ -853,11 +915,15 @@ void CFrameBLL::detectCtrlDevice(_device_command *pCPC, char*buffer) {
 
 	m_SocketMessage->sendBuffer((char*)m_SendCache, length);
 
-	Sleep(5000);
+	Sleep(2000);
 
 	//返回上一级界面
 	cacheNode *tempCacheNode = new cacheNode();
+
+	WaitForSingleObject(analMutex, 500);
 	m_AnalyzeMessage->scanAnalzyeCache(analCacheTable, 0x84, tempCacheNode);
+	ReleaseMutex(analMutex);
+
 	tempCacheNode->getbuffer(buffer, 8);
 
 	delete tempCacheNode;

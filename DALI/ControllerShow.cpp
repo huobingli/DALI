@@ -18,6 +18,8 @@ CControllerShow::CControllerShow(CFrameUI *pUI, CWnd* pParent /*=NULL*/)
 	m_FrameUI = pUI;
 	m_cParam[0] = 0;
 	m_cParam[1] = 0;
+
+	m_MessageStopScan = new CMessageStopScan();
 }
 
 CControllerShow::~CControllerShow()
@@ -83,6 +85,9 @@ void CControllerShow::OnBnScanDevice()
 	DEVICE_COMMAND* pDeviceCommand = new DEVICE_COMMAND();
 	pDeviceCommand->cCommand = 0xFF;
 	//BLL->接口(pDeviceCommand,cBuf);
+	pDeviceCommand->pStatusBarCtrl = m_FrameUI->getStatusBarCtrl();
+	pDeviceCommand->pMessageStopScan = m_MessageStopScan;
+
 
 	//设置主机ID和密码
 	memcpy(pDeviceCommand->DeviceID, m_FrameUI->DeviceID, 4);
@@ -128,7 +133,7 @@ void CControllerShow::OnBnDetectDevice()
 
 	m_FrameUI->setStatusBar("正在扫描控制器中... 请稍候...");
 	//huobingli	
-	m_FrameUI->scanCtrlDevice(pDeviceCommand, (char*)cBuf);
+	m_FrameUI->detectCtrlDevice(pDeviceCommand, (char*)cBuf);
 	//huobingli
 
 	delete pDeviceCommand;

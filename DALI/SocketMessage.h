@@ -6,10 +6,11 @@
 #include "AnalyzeMessage.h"
 #include "CacheTable.h"
 #include "def.h"
-
+#include "Public.h"
 
 using namespace std;
-
+static unsigned char DeviceArray[8];
+static unsigned char ControlArray[8];
 
 struct CommunicateParam{
 	uint8_t paramNum;
@@ -68,14 +69,56 @@ struct _scan{
 	CCacheTable *pAnalCacheTable;
 };
 
+struct _scan_control {
+	CMessageStopScan *pMSS;
+	CStatusBarCtrl *pSBC;
+	CCacheTable *pAnalCacheTable;
+};
+
 //BLL全局接收线程
 static HANDLE handleRecv;
 static HANDLE handleAnal;
 static HANDLE handleScan;
+static HANDLE handleScanHandle;
 
 static HANDLE handleUpdate;
 //static HANDLE handleHeart;
 
+static int updateDeviceArray(char *buffer) {
+	for (int i = 0; i < 8; i++) {
+		DeviceArray[i] = DeviceArray[i] | buffer[i];
+	}
+	int deviceNum = 0;
+	char tempbuffer[8];
+	memcpy(tempbuffer, DeviceArray, 8);
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (tempbuffer[i] % 2 == 1) {
+				deviceNum++;
+				tempbuffer[i] = tempbuffer[i] >> 1;
+			}
+		}
+	}
+	return deviceNum;
+}
+
+static int updateDeviceControlArray(char *buffer) {
+	for (int i = 0; i < 8; i++) {
+		ControlArray[i] = ControlArray[i] | buffer[i];
+	}
+	int deviceNum = 0;
+	char tempbuffer[8];
+	memcpy(tempbuffer, ControlArray, 8);
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (tempbuffer[i] % 2 == 1) {
+				deviceNum++;
+				tempbuffer[i] = tempbuffer[i] >> 1;
+			}
+		}
+	}
+	return deviceNum;
+}
 
 static DWORD WINAPI Scan(LPVOID pM) {
 
@@ -87,18 +130,86 @@ static DWORD WINAPI Scan(LPVOID pM) {
 	CString head = "已经找到 ";
 	CString end = " 个主机";
 	cacheNode *pCacheNode = new cacheNode();
+	
+	char buffer[30];
+	
 	for (int i = 0; i < 400; i++) {
 		//用户没有按下取消按钮，线程继续执行
 		if (CPublic::triggerFlag == 0) {
-			//搜索分析队列中的操作为0x00的元素，获取里面的
-			arg->pAnalCacheTable->scanTable(0x00, pCacheNode);
-			//取出数据，并显示在状态栏
-			//pCacheNode->
+			//搜索分析队列中的操作为0x00的元素，获取里面的主机个数
+
+			memset(buffer, 0, sizeof(buffer));
+			if (arg->pAnalCacheTable->getNodeNum() > 0) {
+				WaitForSingleObject(analMutex, 500);
+				arg->pAnalCacheTable->scanTable(0x83, pCacheNode);
+				ReleaseMutex(analMutex);
+
+				//取出数据，并显示在状态栏
+				pCacheNode->getbuffer(buffer, 8);
+				
+				//更新到DeviceArray
+				int DeviceNum = updateDeviceArray(buffer);
+
+				
+				//组装成
+				status.Format("%s%d%s", head, DeviceNum, end);
+				arg->pSBC->SetText(status, 0, 0);
+			}
 			Sleep(500);
 		}
 		else {
 			CPublic::triggerFlag = 0;
-			return 0;
+			break;
+			//return 0;
+		}
+	}
+	//CPublic::readyFlag = 1;
+	//执行完毕，关闭对话框
+	arg->pMSS->EndDialog(IDOK);
+	return 0;
+}
+
+static DWORD WINAPI ScanControl(LPVOID pM) {
+
+	_scan_control *arg = (_scan_control*)pM;
+	//退出线程方式
+	//1、用户点击取消按钮，线程break。
+	//2、搜索超时，自动退出。
+	CString status;
+	CString head = "已经找到 ";
+	CString end = " 个控制器";
+	cacheNode *pCacheNode = new cacheNode();
+
+	char buffer[30];
+
+	for (int i = 0; i < 400; i++) {
+		//用户没有按下取消按钮，线程继续执行
+		if (CPublic::controlFlag == 0) {
+			//搜索分析队列中的操作为0x00的元素，获取里面的主机个数
+
+			memset(buffer, 0, sizeof(buffer));
+			if (arg->pAnalCacheTable->getNodeNum() > 0) {
+				WaitForSingleObject(analMutex, 500);
+				arg->pAnalCacheTable->scanTable(0x84, pCacheNode);
+				ReleaseMutex(analMutex);
+
+				//取出数据，并显示在状态栏
+				pCacheNode->getbuffer(buffer, 8);
+
+				//更新到DeviceArray
+				int DeviceNum = updateDeviceControlArray(buffer);
+
+
+				//组装成
+				status.Format("%s%d%s", head, DeviceNum, end);
+				arg->pSBC->SetText(status, 0, 0);
+			}
+			Sleep(500);
+		}
+		else {
+			CPublic::controlFlag = 0;
+			break;
+			//return 0;
 		}
 	}
 	//CPublic::readyFlag = 1;
@@ -132,6 +243,14 @@ static DWORD WINAPI Recv(LPVOID pM)
 			);
 		//arg->recvBufferLength = i;
 		if (i > 0) {
+
+			if (arg->recvbuffer[5] == 0x80){
+				Sleep(2000);
+				CPublic::triggerFlag = 1;
+				CPublic::controlFlag = 1;
+				//AfxMessageBox("退出");
+				continue;
+			}
 
 			//crc校验确认
 			if (arg->recvbuffer[5] == 0xFE) {

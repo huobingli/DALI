@@ -222,16 +222,24 @@ public:
 	//扫描链表，获得需要的项，并清除该项
 	//以节点形式返回
 	void scanTable(int operate, cacheNode *pCacheNode) {
-		cacheNode *pScanNode;
+		cacheNode *pScanNode = NULL;
 		pScanNode = m_HeadNode;
 
-		int i = m_NodeNum;
-		if (m_NodeNum == 0)
+		if (m_NodeNum == 0) {
 			return;
-		int flag = 0;
+		}
+			
+		//说明就一个节点
+		if (pScanNode == m_EndNode) {
+			if ((pScanNode->getOperate() & 0xFF) == operate) {
+				memcpy(pCacheNode, pScanNode, sizeof(cacheNode));
+				deleteNode(pScanNode);
+				return;
+			}
+		}
+
 		//寻找含有相同的的操作符的链表节点
 		while (pScanNode != m_EndNode) {
-			flag = 1;
 			//如果找到操作符匹配项
 			if ((pScanNode->getOperate() & 0xFF) == operate) {
 				//获取buffer
@@ -239,17 +247,11 @@ public:
 				
 				//删除该指定节点
 				deleteNode(pScanNode);
-				break;
+				return;
 			}
 			else {
 				pScanNode = pScanNode->getNextNode();
 			}
-		}
-		if (flag == 0) {
-			memcpy(pCacheNode, pScanNode, sizeof(cacheNode));
-			//删除该指定节点
-			deleteNode(pScanNode);
-			//pScanNode = NULL;
 		}
 	}
 

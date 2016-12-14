@@ -95,6 +95,7 @@ typedef struct _console_command
 	int		nBrightness = -1;
 	int		nSenceID = -1;
 	int		nTimeInterval = -1;
+	int		nDeviceAddr = -1;
 
 	unsigned char DeviceID[4];
 	unsigned char DevicePWD[16];
@@ -156,6 +157,9 @@ typedef struct _device_command
 
 	unsigned char DeviceID[4];
 	unsigned char DevicePWD[16];
+
+	CStatusBarCtrl *pStatusBarCtrl;
+	CMessageStopScan *pMessageStopScan;
 }DEVICE_COMMAND, *PDEVICE_COMMAND;
 
 

@@ -114,4 +114,8 @@ private:
 	void ShowStatus(STATUS* pStatus);					//显示状态
 	void ShowDALIDevice();								//显示DALI设备状态
 	int UpdateTag(char* pBuf,int nCycleTime);			//更新DALI设备标志
+public:
+//	afx_msg void OnSetfocusConsoleIdcComboTargetaddr();
+//	afx_msg void OnSetfocusConsoleIdcComboTargetaddr();
+	afx_msg void OnSelendokConsoleIdcComboTargetaddr();
 };

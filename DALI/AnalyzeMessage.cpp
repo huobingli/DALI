@@ -39,7 +39,9 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			changeBuffer(recvBuffer, 12, (int)recvBuffer[11], analbuffer);
 			analNode->setbuffer(analbuffer, (int)recvBuffer[11]);
 			//---------------------------需要确定
+			WaitForSingleObject(analMutex, 500);
 			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
 		}
 		//recv scan device message
 		case 0x83: {
@@ -52,7 +54,9 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			//传入需要返回的参数
 			analNode->setbuffer(analbuffer, 20);
 			//放入分析缓存
+			WaitForSingleObject(analMutex, 500);
 			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
 			break;
 		}
 
@@ -68,7 +72,9 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			analNode->setbuffer(analbuffer, (int)recvBuffer[13]);
 			analNode->setLength(2);
 			//放入分析缓存
+			WaitForSingleObject(analMutex, 500);
 			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
 			break;
 		}
 		//Sence recv config message
@@ -78,7 +84,9 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			analNode->setbuffer(analbuffer, 16);
 			analNode->setLength(16);
 			//放入分析缓存
+			WaitForSingleObject(analMutex, 500);
 			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
 			break;
 		}
 		//
@@ -88,7 +96,9 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			analNode->setbuffer(analbuffer, 32);
 			analNode->setLength(32);
 			//放入分析缓存
+			WaitForSingleObject(analMutex, 500);
 			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
 			break;
 		}
 		//getIPDlg
@@ -107,7 +117,9 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 				analNode->setbuffer(analbuffer, 22 * recvBuffer[7]);
 				analNode->setLength(22 * recvBuffer[7] + 1);
 				//放入分析缓存
+				WaitForSingleObject(analMutex, 500);
 				analCacheTable->insertNode(analNode);
+				ReleaseMutex(analMutex);
 			//}
 			break;
 		}
@@ -123,7 +135,9 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			//传入需要返回的参数
 			analNode->setbuffer(analbuffer, 10);
 			//放入分析缓存
+			WaitForSingleObject(analMutex, 500);
 			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
 			break;
 		}
 
@@ -137,7 +151,9 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			//传入需要返回的参数
 			analNode->setbuffer(analbuffer, 14);
 			//放入分析缓存
+			WaitForSingleObject(analMutex, 500);
 			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
 			break;
 		}
 
@@ -152,7 +168,26 @@ void CAnalyzeMessage::startAnlayzeMessage(CCacheTable* analCacheTable, cacheNode
 			analNode->setbuffer(analbuffer, (int)recvBuffer[13]);
 			analNode->setLength(2);
 			//放入分析缓存
+			WaitForSingleObject(analMutex, 500);
 			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
+			break;
+		}
+
+		case 0x92:{
+			//获得设备数目	;
+			analNode->setOperate(0x92);
+			analNode->setst(recvNode->getst());
+
+			//通过change,得到有用的信息
+			changeBuffer(recvBuffer, 12, (int)recvBuffer[11], analbuffer);
+			//传入需要返回的参数
+			analNode->setbuffer(analbuffer, (int)recvBuffer[11]);
+			analNode->setLength(2);
+			//放入分析缓存
+			WaitForSingleObject(analMutex, 500);
+			analCacheTable->insertNode(analNode);
+			ReleaseMutex(analMutex);
 			break;
 		}
 	}

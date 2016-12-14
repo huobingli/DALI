@@ -32,7 +32,7 @@ private:
 	CStatic			m_DeviceID;							//设备ID
 	CEdit			m_Edit[5];
 	unsigned char	m_cParam[2];
-
+	CMessageStopScan *m_MessageStopScan;
 
 public:
 	afx_msg void OnBnScanDevice();						//扫描设备按钮

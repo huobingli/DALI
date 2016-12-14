@@ -362,11 +362,16 @@ void CSence::OnBnSaveConfig()
 	}
 	for (int i = 0; i < DALI_NUM; ++i)
 	{
-		if (m_DALI[i].m_nBrightness  != 0)
+		if (m_DALI[i].m_nBrightness != 0)
 			pSenceCommand->cBrightness[i] = (unsigned char)m_DALI[i].m_nBrightness * 254 / 100;
-		else
-		{
-			pSenceCommand->cBrightness[i] = 255;
+		else {
+			if (m_DALI[i].m_CButton.GetCheck() == 0)
+			{
+				pSenceCommand->cBrightness[i] = 0xff;
+			}
+			else {
+				pSenceCommand->cBrightness[i] = 0x00;
+			}
 		}
 	}
 	//·¢ËÍ¸øBLL²ã

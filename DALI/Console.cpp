@@ -97,6 +97,9 @@ BEGIN_MESSAGE_MAP(CConsole, CDialogEx)
 	ON_BN_CLICKED(CONSOLE_IDC_BUTTON_SCANDEVICE,OnBnScanDevice)
 	ON_BN_CLICKED(CONSOLE_IDC_BUTTON_DETEDTDEVICE,OnBnDetectDevice)
 	ON_COMMAND_RANGE(IDC_BUTTON1,IDC_BUTTON64, OnBnDALIDevice)
+
+//ON_CBN_SETFOCUS(CONSOLE_IDC_COMBO_TARGETADDR, &CConsole::OnSetfocusConsoleIdcComboTargetaddr)
+ON_CBN_SELENDOK(CONSOLE_IDC_COMBO_TARGETADDR, &CConsole::OnSelendokConsoleIdcComboTargetaddr)
 END_MESSAGE_MAP()
 
 
@@ -153,7 +156,7 @@ BOOL CConsole::OnInitDialog()
 	m_SliderCtrlConsole.SetRange(0, 100);
 	m_SliderCtrlConsole.SetPos(100);
 	/*开始不可选择的部分*/
-	NonoptionalPart();
+	//NonoptionalPart();
 
 	/*DALI设备按钮初始不可用*/
 	for (int i = 0; i < DALI_DEVICE_NUM; ++i)
@@ -1033,7 +1036,7 @@ void CConsole::OnClickedConsoleIdcCheckBoardcast()
 	{
 		m_CheckBroadCast.SetCheck(false);
 		m_ComboTargetAddr.EnableWindow(true);
-		NonoptionalPart();
+		//NonoptionalPart();
 		m_FrameUI->setStatusBar("未选择模式");
 	}
 }
@@ -1054,7 +1057,7 @@ void CConsole::OnClickedConsoleIdcCheckGroup()
 	{
 		m_CheckGroup.SetCheck(false);
 		m_ComboTargetAddr.EnableWindow(true);
-		NonoptionalPart();
+		//NonoptionalPart();
 		m_FrameUI->setStatusBar("未选择模式");
 	}
 }
@@ -1092,17 +1095,18 @@ void CConsole::SendMessage(int nBrightness)
 	if (m_CheckBroadCast.GetCheck())
 	{
 		CONSOLE_COMMAND *pConsoleCommand = new CONSOLE_COMMAND();
-		pConsoleCommand->cMode = BROADCAST_MODE;
+		pConsoleCommand->cMode = 0xff;
 		pConsoleCommand->nCommand = 0x05;
 		pConsoleCommand->nBrightness = nBrightness;
 
 		//将获取到的主机ID和密码写入到结构体中
 		memcpy(pConsoleCommand->DeviceID, m_FrameUI->DeviceID, 4);
 		memcpy(pConsoleCommand->DevicePWD, m_FrameUI->DevicePWD, 16);
+		
+		//pConsoleCommand->nDeviceAddr = 0xFE;
 
 		//pFrameBLL->sendConsoleParameters(pConsoleCommand);
 		m_FrameUI->sendChangeLightness(pConsoleCommand);
-		
 		CString baseStatus = "广播模式，调亮  ";
 		CString status;
 		status.Format("%s %d", baseStatus, nBrightness);
@@ -1124,7 +1128,7 @@ void CConsole::SendMessage(int nBrightness)
 			return;
 		}
 		CONSOLE_COMMAND *pConsoleCommand = new CONSOLE_COMMAND();
-		pConsoleCommand->cMode = GROUP_MODE;
+		pConsoleCommand->cMode = 0x80 + m_ComboGroup.GetCurSel();
 		pConsoleCommand->nCommand = 0x05;
 		pConsoleCommand->nBrightness = nBrightness;
 		pConsoleCommand->nGroupID = nGroupID;
@@ -1149,7 +1153,7 @@ void CConsole::SendMessage(int nBrightness)
 	else if (m_ComboTargetAddr.GetCurSel() >= 0)
 	{
 		CONSOLE_COMMAND *pConsoleCommand = new CONSOLE_COMMAND();
-		pConsoleCommand->cMode = TARGET_MODE;
+		pConsoleCommand->cMode = m_ComboTargetAddr.GetCurSel();
 		pConsoleCommand->nCommand = 0x05;
 		pConsoleCommand->nBrightness = nBrightness;
 		pConsoleCommand->nDALIID = m_ComboTargetAddr.GetCurSel();
@@ -1233,6 +1237,16 @@ int CConsole::UpdateTag(char* pBuf,int nCycleTime)
 			m_FrameUI->m_DALIDeviceArray[nCycleTime * 8 + i].nTag = 0;
 		}
 	}
-
+	
 	return deviceNum;
+}
+
+
+void CConsole::OnSelendokConsoleIdcComboTargetaddr()
+{
+	// TODO:  在此添加控件通知处理程序代码
+	if (m_ComboTargetAddr.GetCurSel() > 0)  {
+		m_FrameUI->setStatusBar("已选择单播模式");
+		OptionalPart();
+	}
 }
